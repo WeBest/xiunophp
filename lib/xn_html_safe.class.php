@@ -1587,7 +1587,7 @@ class xn_html_safe {
 			'family'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
 			'target'=>array('list', '_self', array('_blank', '_self')),
-			'class'=>array('pcre', '', array('#^brush:\w+\s*(tab-size:\d+)?$#')),
+			'class'=>array('pcre', '', array('#^brush:\w+;?\s*(tab\-size:\d+)?$#is')),
 			'type'=>array('pcre', '', array('#^[\w/\-]+$#')),
 			'allowfullscreen'=>array('list', 'true', array('true', '1', 'on')),
 			'wmode'=>array('list', 'transparent', array('transparent', '')),
@@ -1630,10 +1630,11 @@ class xn_html_safe {
 		return $result;
 	}
 }
-
-/*error_reporting(E_ALL);
+/*
+error_reporting(E_ALL);
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
-$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
+//$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
+$s = '<pre class="brush:php; tab-size:8">xxxxxxxxxxx</div>';
 
 echo xn_html_safe::filter($s);*/
 ?>
