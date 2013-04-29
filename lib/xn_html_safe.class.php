@@ -1390,15 +1390,15 @@ class HTML_White {
 							}
 						}
 						$cssvalue = $ok ? $cssvalue : $v[1];
-					}
+					} else {
+	        				continue;
+	        			}
 				}
 				$value = '';
 				foreach ($csskv as $k=>$v) {
 					$value .= "$k:$v; ";
 				}
-				
 				$value = substr($value, 0, -1);
-
 	                // 白名单值
 	                } elseif(isset($this->white_value[$name]))  {
 	                	$v = $this->white_value[$name];
@@ -1408,11 +1408,11 @@ class HTML_White {
 						$value = intval($value);
 						$px = 1;
 					}
-					if($value < $v[2] || $value > $v[2]) $value = $v[1];
+					if($value < $v[2][0] || $value > $v[2][1]) $value = $v[1];
 					if($px) $value .= 'px';
         			} elseif($v[0] == 'list') {
         				if(!in_array($value, $v[2])) $value = $v[1];
-        			} elseif($v[0] == 'prce') {
+        			} elseif($v[0] == 'pcre') {
         				$ok = 0;
         				foreach($v[2] as $pcre) {
         					if(preg_match($pcre, $value)) {
@@ -1420,6 +1420,8 @@ class HTML_White {
         					}
         				}
         				$value = $ok ? $value : $v[1];
+        			} else {
+        				continue;
         			}
 	        	} else {
 	        		continue;
@@ -1516,7 +1518,7 @@ class HTML_White {
 	
 	public function _dataHandler(&$parser, $data) {
 		if (count($this->_dcStack) == 0) {
-		    $this->_xhtml .= htmlspecialchars($data);
+		    $this->_xhtml .= str_replace('>', '&gt;', $data);
 		}
 		return true;
 	}
@@ -1559,8 +1561,8 @@ class HTML_White {
 class xn_html_safe {
 	// 严格的图片URL格式
 	public static $pattern = array(
-		'img_url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp)$#is',
-		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp)$#is',
+		'img_url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp|swf)$#is',
+		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(\w+)\?\S*$#is',
 		'mailto'=>'#^mailto:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ftp_url'=>'#^ftp:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ed2k_url'=>'#^ed2k://[\w%\-\.|=]+?$#is',
@@ -1579,8 +1581,8 @@ class xn_html_safe {
 		$white_value = array(
 			'href'=>array('pcre', '', array(self::$pattern['url'])),
 			'src'=>array('pcre', '', array(self::$pattern['img_url'])),
-			'width'=>array('range', 400, array(0, 1800)),
-			'height'=>array('range', 400, array(0, 80000)),
+			'width'=>array('range', '100%', array(0, 1800)),
+			'height'=>array('range', 'auto', array(0, 80000)),
 			'size'=>array('range', 5, array(1, 30)),
 			'family'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
@@ -1602,8 +1604,8 @@ class xn_html_safe {
 			'font-weight'=>array('pcre', 'none', array(self::$pattern['safe'])),
 			'font-family'=>array('pcre', 'none', array(self::$pattern['safe'])),
 			'font-size'=>array('range', 9, array(6, 26)),
-			'width'=>array('range', 400, array(1, 1800)),
-			'height'=>array('range', 400, array(1, 80000)),
+			'width'=>array('range', '100%', array(1, 1800)),
+			'height'=>array('range', '', array(1, 80000)),
 			'min-width'=>array('range', 1, array(1, 80000)),
 			'min-height'=>array('range', 400, array(1, 80000)),
 			'max-width'=>array('range', 1800, array(1, 80000)),
@@ -1630,6 +1632,8 @@ class xn_html_safe {
 }
 
 /*error_reporting(E_ALL);
-$s = '<b onclick="ddd">abcc</b><table style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
+//$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
+$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
+
 echo xn_html_safe::filter($s);*/
 ?>
