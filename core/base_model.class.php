@@ -507,6 +507,15 @@ class base_model {
 		return $this->db->index_count($this->table, $cond);
 	}
 	
+	// $index = array('uid'=>1, 'dateline'=>-1)
+	public function index_create($index) {
+		$this->db->index_create($this->table, $index);
+	}
+	
+	public function index_drop($index) {
+		$this->db->index_drop($this->table, $index);
+	}
+	
 	// 从 arr 中提取 key string
 	public function get_key($arr) {
 		$s = $this->table;
