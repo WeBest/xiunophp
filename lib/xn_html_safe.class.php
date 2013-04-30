@@ -1562,7 +1562,7 @@ class xn_html_safe {
 	// 严格的图片URL格式
 	public static $pattern = array(
 		'img_url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp|swf)$#is',
-		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(\w+)\?\S*$#is',
+		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]\??[^\s<\x7f-\xff]*$#is',
 		'mailto'=>'#^mailto:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ftp_url'=>'#^ftp:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ed2k_url'=>'#^ed2k://[\w%\-\.|=]+?$#is',
@@ -1630,11 +1630,10 @@ class xn_html_safe {
 		return $result;
 	}
 }
-/*
 error_reporting(E_ALL);
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
 //$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
-$s = '<pre class="brush:php; tab-size:8">xxxxxxxxxxx</div>';
+$s = '<a href="http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz" target="_blank">http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz</a>';
 
-echo xn_html_safe::filter($s);*/
+echo xn_html_safe::filter($s);
 ?>
