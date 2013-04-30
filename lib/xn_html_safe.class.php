@@ -1427,15 +1427,19 @@ class HTML_White {
 	        		continue;
 	        	}
 	
-	                if (($value === TRUE) || (is_null($value))) {
+	        	if (($value === TRUE) || (is_null($value))) {
 				$value = $name;
 	                }
-	
+	                
 			$tempval = preg_replace('/&#(\d+);?/me', "chr('\\1')", $value); //"'
 			$tempval = preg_replace('/&#x([0-9a-f]+);?/mei', "chr(hexdec('\\1'))", $tempval);
 
 			$value = str_replace("\"", "&quot;", $value);
-			$this->_xhtml .= ' ' . $name . '="' . $value . '"';
+			if($value == '' && $name == 'style') {  
+				//$this->_xhtml .= ' ' . $name . '="' . $value . '"';
+			} else {
+				$this->_xhtml .= ' ' . $name . '="' . $value . '"';
+			}
 		}
         }
         
@@ -1610,7 +1614,7 @@ class xn_html_safe {
 			'min-height'=>array('range', 400, array(1, 80000)),
 			'max-width'=>array('range', 1800, array(1, 80000)),
 			'max-height'=>array('range', 80000, array(1, 80000)),
-			'line-height'=>array('range', 1, array(1, 5)),
+			'line-height'=>array('range', 1, array(1, 50)),
 			'color'=>array('pcre', '#000000', array(self::$pattern['color'])),
 			'background'=>array('pcre', 'none', array(self::$pattern['color'], self::$pattern['img_url'], '#url\((https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp)\)[\w\s\-]*$#')),
 			'background-color'=>array('pcre', 'none', array(self::$pattern['color'])),
@@ -1633,7 +1637,7 @@ class xn_html_safe {
 /*error_reporting(E_ALL);
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
 //$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
-$s = '<a href="http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz" target="_blank">http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz</a>';
+$s = '<p style="margin-top: 0px;">　　<strong style="margin: 0px; padding: 0px;">模仿视频练习杀人技巧</strong></p><p style="margin-top: 0px;">　　2007年7月，该团伙骨干成员木沙・艾山曾涉嫌暴恐活动被公安机关审查。2010年9月，木沙・艾山与喀斯木・买买提结识。此后，喀斯木・买买提先后与团伙其他成员相识。2012年9月以来，上述人员经常观看宣传宗教极端和暴恐内容的音视频，形成了暴恐团伙。</p>';
 
 echo xn_html_safe::filter($s);*/
 ?>
