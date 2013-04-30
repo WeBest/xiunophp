@@ -1614,7 +1614,7 @@ class xn_html_safe {
 			'min-height'=>array('range', 400, array(1, 80000)),
 			'max-width'=>array('range', 1800, array(1, 80000)),
 			'max-height'=>array('range', 80000, array(1, 80000)),
-			'line-height'=>array('range', 14, array(1, 50)),
+			'line-height'=>array('range', '14px', array(1, 50)),
 			'color'=>array('pcre', '#000000', array(self::$pattern['color'])),
 			'background'=>array('pcre', 'none', array(self::$pattern['color'], self::$pattern['img_url'], '#url\((https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp)\)[\w\s\-]*$#')),
 			'background-color'=>array('pcre', 'none', array(self::$pattern['color'])),
