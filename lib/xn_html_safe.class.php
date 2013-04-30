@@ -1630,10 +1630,10 @@ class xn_html_safe {
 		return $result;
 	}
 }
-error_reporting(E_ALL);
+/*error_reporting(E_ALL);
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
 //$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
 $s = '<a href="http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz" target="_blank">http://www.xiuno.com/down/xiuno_bbs_2.0.2.patch.tar.gz</a>';
 
-echo xn_html_safe::filter($s);
+echo xn_html_safe::filter($s);*/
 ?>
