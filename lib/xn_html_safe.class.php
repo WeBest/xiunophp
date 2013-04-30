@@ -1587,7 +1587,7 @@ class xn_html_safe {
 			'src'=>array('pcre', '', array(self::$pattern['img_url'])),
 			'width'=>array('range', '100%', array(0, 1800)),
 			'height'=>array('range', 'auto', array(0, 80000)),
-			'size'=>array('range', 5, array(1, 30)),
+			'size'=>array('range', 4, array(-10, 10)),
 			'family'=>array('pcre', '', array(self::$pattern['word'])),
 			'face'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
