@@ -1363,7 +1363,7 @@ class HTML_White {
 				$value = str_replace('&', '&amp;', $value);
 				
 				preg_match_all('#\s*([\w\-]+)\s*:\s*([^;]+)\s*;?\s*#is', $value, $m);
-				$csskv = is_array($m[1]) && is_array($m[2]) ? array_combine($m[1], $m[2]) : array();
+				$csskv = !empty($m[1]) && !empty($m[2]) ? array_combine($m[1], $m[2]) : array();
 				foreach($csskv as $cssname=>&$cssvalue) {
 					if(!isset($this->white_css[$cssname])) {
 						unset($csskv[$cssname]);
