@@ -1569,7 +1569,7 @@ class xn_html_safe {
 		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]\??[^\s<\x7f-\xff]*$#is',
 		'mailto'=>'#^mailto:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ftp_url'=>'#^ftp:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
-		'ed2k_url'=>'#^ed2k://[\w%\-\.|=]+?$#is',
+		'ed2k_url'=>'#^ed2k://[^\s\'\"\\\\<>]+?$#is',
 		'color'=>'#^(\#\w{3,6})|(rgb\(\d+,\s*\d+,\s*\d+\)|(\w{3,10}))$#is',
 		'safe'=>'#^[\w\-\.\s]+$#is',
 		'word'=>'#^[\w\-\x7f-\xff]+$#is',
@@ -1583,7 +1583,7 @@ class xn_html_safe {
 			'br', 'img', 'area', 'embed',
 		);
 		$white_value = array(
-			'href'=>array('pcre', '', array(self::$pattern['url'])),
+			'href'=>array('pcre', '', array(self::$pattern['url'], self::$pattern['ed2k_url'])),
 			'src'=>array('pcre', '', array(self::$pattern['img_url'])),
 			'width'=>array('range', '100%', array(0, 1800)),
 			'height'=>array('range', 'auto', array(0, 80000)),
