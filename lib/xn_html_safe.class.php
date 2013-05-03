@@ -1565,8 +1565,8 @@ class HTML_White {
 class xn_html_safe {
 	// 严格的图片URL格式
 	public static $pattern = array(
-		'img_url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp|swf)$#is',
-		'url'=>'#^(https?://)?([\w%\-\.]+?/)*[\w%\-\.]\??[^\s<\x7f-\xff]*$#is',
+		'img_url'=>'#^(https?://[^\'"\\\\<>]+?:?\d?)?([^\'"\\\\<>:]+?)*$#is',
+		'url'=>'#^(https?://[^\'"\\\\<>]+?:?\d?)?([^\'"\\\\<>:]+?)*$#is',
 		'mailto'=>'#^mailto:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ftp_url'=>'#^ftp:([\w%\-\.]+?)@([\w%\-\.]+?)(\.[\w%\-\.]+?)+$#is',
 		'ed2k_url'=>'#^ed2k://[^\s\'\"\\\\<>]+?$#is',
@@ -1617,7 +1617,7 @@ class xn_html_safe {
 			'max-height'=>array('range', 80000, array(1, 80000)),
 			'line-height'=>array('range', '14px', array(1, 50)),
 			'color'=>array('pcre', '#000000', array(self::$pattern['color'])),
-			'background'=>array('pcre', 'none', array(self::$pattern['color'], self::$pattern['img_url'], '#url\((https?://)?([\w%\-\.]+?/)*[\w%\-\.]+\.(jpg|gif|png|bmp)\)[\w\s\-]*$#')),
+			'background'=>array('pcre', 'none', array(self::$pattern['color'], '#url\((https?://[^\'"\\\\<>]+?:?\d?)?([^\'"\\\\<>:]+?)*\)[\w\s\-]*$#')),
 			'background-color'=>array('pcre', 'none', array(self::$pattern['color'])),
 			'background-image'=>array('pcre', 'none', array(self::$pattern['img_url'])),
 			'background-position'=>array('pcre', 'none', array(self::$pattern['safe'])),
@@ -1645,7 +1645,8 @@ class xn_html_safe {
 /*error_reporting(E_ALL);
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
 //$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
-$s = '<p style="margin-top: 0px;">　　<strong style="margin: 0px; padding: 0px;">模仿视频练习杀人技巧</strong></p><p style="margin-top: 0px;">　　2007年7月，该团伙骨干成员木沙・艾山曾涉嫌暴恐活动被公安机关审查。2010年9月，木沙・艾山与喀斯木・买买提结识。此后，喀斯木・买买提先后与团伙其他成员相识。2012年9月以来，上述人员经常观看宣传宗教极端和暴恐内容的音视频，形成了暴恐团伙。</p>';
-
+//$s = '<p style="margin-top: 0px;">　　<strong style="margin: 0px; padding: 0px;">模仿视频练习杀人技巧</strong></p><p style="margin-top: 0px;">　　2007年7月，该团伙骨干成员木沙・艾山曾涉嫌暴恐活动被公安机关审查。2010年9月，木沙・艾山与喀斯木・买买提结识。此后，喀斯木・买买提先后与团伙其他成员相识。2012年9月以来，上述人员经常观看宣传宗教极端和暴恐内容的音视频，形成了暴恐团伙。</p>';
+$s = '<a href="javascript://www.x.net/?dkdkkek*(*">abcc</a>';
+$s = '<a href="/**/javascript :alert(123);">abcc</a>';
 echo xn_html_safe::filter($s);*/
 ?>

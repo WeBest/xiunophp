@@ -70,9 +70,6 @@ class core {
 	
 	// 替代 json_encode
 	public static function json_encode($data) {
-		if(version_compare(PHP_VERSION, '5.2.0', '>=')) {
-			return json_encode($data);
-		}
 		if(is_array($data) || is_object($data)) {
 			$islist = is_array($data) && (empty($data) || array_keys($data) === range(0,count($data)-1));
 			if($islist) {

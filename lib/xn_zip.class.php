@@ -71,7 +71,7 @@ class php_zip {
 		{
 			if($file == '.' || $file == '..'){ continue; }
 	
-			$pathSub    = preg_replace("*/{2,}*", "/", $path."/".$file);
+			$pathSub    = preg_replace("*/{2,999}*", "/", $path."/".$file);
 			$fileList[] = is_dir($pathSub) ? $pathSub."/" : $pathSub;
 			if(is_dir($pathSub)){ $this->visit_file($pathSub); }
 		}
