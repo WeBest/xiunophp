@@ -1646,5 +1646,6 @@ class xn_html_safe {
 //$s = '<b onclick="ddd">abcc</b><table class="abc" style="width: 103330px;  expression:(alert(123)); background: url(1.jpg) no-repeat ;" allowfullscreen="xxx" allowscriptaccess="yes"><tr><td>xxxxxxxxxxx</td></tr></table>';
 //$s = '<embed wmode="transparent" src="http://player.youku.com/player.php/sid/XNDcxMDUzNzI4/v.swf" style="z-index:0;" width="876" height="454" type="application/x-shockwave-flash" allowfullscreen="true" class="border"><br><div></div>';
 //$s = '<p style="margin-top: 0px;">　　<strong style="margin: 0px; padding: 0px;">模仿视频练习杀人技巧</strong></p><p style="margin-top: 0px;">　　2007年7月，该团伙骨干成员木沙・艾山曾涉嫌暴恐活动被公安机关审查。2010年9月，木沙・艾山与喀斯木・买买提结识。此后，喀斯木・买买提先后与团伙其他成员相识。2012年9月以来，上述人员经常观看宣传宗教极端和暴恐内容的音视频，形成了暴恐团伙。</p>';
+$s = '<a href="javascript://www.baidu.com/">baidu</a>';
 echo xn_html_safe::filter($s);*/
 ?>
