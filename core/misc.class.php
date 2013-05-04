@@ -543,7 +543,7 @@ class misc {
 	}
 	
 	// 递归删除目录，这个函数比较危险，传参一定要小心
-	public static function rmdir($dir) {
+	public static function rmdir($dir, $keepdir = 0) {
 		if($dir == '/' || $dir == '../') return FALSE;// 不允许删除根目录，避免程序意外删除数据。
 		if(!is_dir($dir)) return FALSE;
 		substr($dir, -1, 1) != '/' && $dir .= '/';
@@ -557,9 +557,10 @@ class misc {
 				self::rmdir($filepath.'/');
 			}
 		}
-		try {rmdir($dir);} catch (Exception $e) {}
+		try {if(!$keepdir) rmdir($dir);} catch (Exception $e) {}
 		return TRUE;
 	}
+	
 }
 
 ?>
