@@ -10,7 +10,7 @@ class check {
 	}
 	
 	static function is_url($s) {
-		return preg_match('#^http://#i', $s);  //url已http://开头  i 忽略大小写
+		return preg_match('#^(https?://[^\'"\\\\<>:\s]+(:\d+)?)?([^\'"\\\\<>:\s]+?)*$#is', $s);  //url已http://开头  i 忽略大小写
 	}
 	
 	static function is_qq($s) {
