@@ -427,11 +427,11 @@ class base_model {
 	}
 	
 	public function index_fetch($cond = array(), $orderby = array(), $start = 0, $limit = 10) {
-		return $this->db_cache_index_fetch($this->table, $this->primarykey, $cond, $orderby, $start, $limit);	
+		return (array)$this->db_cache_index_fetch($this->table, $this->primarykey, $cond, $orderby, $start, $limit);	
 	}
 	
 	public function index_fetch_id($cond = array(), $orderby = array(), $start = 0, $limit = 10) {
-		return $this->db->index_fetch_id($this->table, $this->primarykey, $cond, $orderby, $start, $limit);	
+		return (array)$this->db->index_fetch_id($this->table, $this->primarykey, $cond, $orderby, $start, $limit);	
 	}
 	
 	// 2.4 新增接口，按照条件更新，不鼓励使用

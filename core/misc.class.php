@@ -359,11 +359,58 @@ class misc {
 			return false;
 		}
 	}
-	
+
+	// https request
+	public static function https_fetch_url($url, $timeout=30, $header=array()) {
+		if(substr($url, 0, 5) == 'http:') {
+			return self::fetch_url($url, $timeout);
+		}
+		$w = stream_get_wrappers();
+		if(extension_loaded('openssl') && in_array('https', $w)) {
+			return file_get_contents($url);
+		} elseif (!function_exists('curl_init')) {
+			throw new Exception('server not installed curl.');
+		}
+		$ch = curl_init();
+		curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+		curl_setopt($ch, CURLOPT_HEADER, true);
+		curl_setopt($ch, CURLOPT_URL, $url);
+		curl_setopt($ch, CURLOPT_USERAGENT, core::gpc('HTTP_USER_AGENT', 'S'));
+		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
+		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1); // 从证书中检查SSL加密算法是否存在
+		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+		if(!empty($header)) {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		}
+		$data = curl_exec($ch);
+		if(curl_errno($ch)) {
+			throw new Exception('Errno'.curl_error($ch));//捕抓异常
+		}
+		if(!$data) {
+			curl_close($ch);
+			return '';
+		}
+		list($header, $data) = explode("\r\n\r\n", $data);
+		$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+		if ($http_code == 301 || $http_code == 302) {
+			$matches = array();
+			preg_match('/Location:(.*?)\n/', $header, $matches);
+			$url = trim(array_pop($matches));
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_HEADER, false);
+			$data = curl_exec($ch);
+		}
+		curl_close($ch);
+		return $data;  
+	}
+
 	// SAE 重载了 file_get_contents()
 	public static function fetch_url($url, $timeout = 5, $post = '', $cookie = '', $deep = 0) {
 		if($deep > 5) throw new Exception('超出 fetch_url() 最大递归深度！');
-		
+		if(substr($url, 0, 5) == 'https') {
+			return self::https_fetch_url($url, $timeout);
+		}
 		if(ini_get('allow_url_fopen') && empty($post)) {
 			// 尝试连接
 			$opts = array ('http'=>array('method'=>'GET', 'timeout'=>$timeout)); 
@@ -442,6 +489,7 @@ class misc {
 			return FALSE;
 		}
 	}
+	
 	
 	// 多线程抓取数据，需要CURL支持，一般在命令行下执行，此函数收集互联网，由 xiuno 整理。
 	public static function multi_fetch_url($urls) {
