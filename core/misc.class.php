@@ -378,7 +378,7 @@ class misc {
 		curl_setopt($ch, CURLOPT_USERAGENT, core::gpc('HTTP_USER_AGENT', 'S'));
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1); // 从证书中检查SSL加密算法是否存在
-		curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转
+		//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转, 安全模式不允许
 		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		if(!empty($header)) {
 			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
