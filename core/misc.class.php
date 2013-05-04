@@ -366,7 +366,7 @@ class misc {
 			return self::fetch_url($url, $timeout);
 		}
 		$w = stream_get_wrappers();
-		if(extension_loaded('openssl') && in_array('https', $w)) {
+		if(extension_loaded('openssl') && in_array('https', $w) && ini_get('allow_url_fopen')) {
 			return file_get_contents($url);
 		} elseif (!function_exists('curl_init')) {
 			throw new Exception('server not installed curl.');
