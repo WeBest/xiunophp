@@ -439,14 +439,13 @@ class xn_zip {
 	public static function mkdir($path) {
 		// 查找最后一个 /
 		if(empty($path) || strpos($path, '/') === FALSE || $path == '/') return;
-		try {$isdir = is_dir($path);} catch (Exception $e) {$isdir = 1;}
-		if(!$isdir) {
+		if(!is_dir($path)) {
 			// 开始一级级的检测目录
 			$arr = explode('/', $path);
 			$t = array_shift($arr);
 			while($first = array_shift($arr)) {
 				$t .= '/'.$first;
-				try {$isdir = is_dir($t); } catch (Exception $e) {$isdir = 1;}
+				try {$isdir = is_dir($t); } catch (Exception $e) {$isdir = 0;}
 				if(!$isdir) {
 					try {mkdir($t, 0777);} catch (Exception $e) {}
 				}
