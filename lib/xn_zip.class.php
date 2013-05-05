@@ -73,7 +73,7 @@ class php_zip {
 	
 			$pathSub    = preg_replace("*/{2,999}*", "/", $path."/".$file);
 			$fileList[] = is_dir($pathSub) ? $pathSub."/" : $pathSub;
-			if(is_dir($pathSub)){ $this->visit_file($pathSub); }
+			if(is_dir($pathSub)){ $fileList = array_merge($fileList, $this->visit_file($pathSub)); }
 		}
 		$fdir->close();
 		return $fileList;
