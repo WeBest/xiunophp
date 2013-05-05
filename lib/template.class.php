@@ -90,7 +90,7 @@ class template {
 						break;
 					}
 					if(is_file($path.$filename)) {
-						return $path.$filename;
+						$file = $path.$filename;
 						break;
 					} else {
 						$file = '';
