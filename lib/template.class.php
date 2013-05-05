@@ -79,17 +79,18 @@ class template {
 					$file = '';
 				}
 			}
-			if(empty($file) && empty($this->conf['disable_plugin'])) {
+			if(empty($file) && empty($this->conf['plugin_disable'])) {
 				$plugins = core::get_plugins($this->conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
 					$path = $this->conf['plugin_path'].$v.'/';
 					// 如果有相关的 app path, 这只读取该目录
-					if(is_dir($path.$this->conf['app_id'])) {
-						$path = $path.$this->conf['app_id'].'/';
+					if(is_file($path.$this->conf['app_id'].'/'.$filename)) {
+						$file = $path.$this->conf['app_id'].'/'.$filename;
+						break;
 					}
-					$file = $path.$filename;
-					if(is_file($file)) {
+					if(is_file($path.$filename)) {
+						return $path.$filename;
 						break;
 					} else {
 						$file = '';

@@ -130,7 +130,7 @@ return array(
 	// 服务器所在的时区
 	'timeoffset' => '+8',
 	
-	'disable_plugin'=>0,			// 禁止掉所有插件
+	'plugin_disable'=>0,			// 禁止掉所有插件
 	
 	'urlrewrite' => 0,			// 手工开启 URL-Rewrite 后，需要清空下 tmp 目录！
 	

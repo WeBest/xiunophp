@@ -601,11 +601,15 @@ class core {
 					break;
 				}
 			}
-			if(empty($orgfile) && empty($conf['disable_plugin'])) {
+			if(empty($orgfile) && empty($conf['plugin_disable'])) {
 				$plugins = self::get_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as &$v) {
-					$path = $conf['plugin_path'].$v;
+					$path = $conf['plugin_path'].$v.'/';
+					if(is_file($path.$conf['app_id'].'/'."$model.class.php")) {
+						$orgfile = $path.$conf['app_id'].'/'."$model.class.php";
+						break;
+					}
 					if(is_file($path."$model.class.php")) {
 						$orgfile = $path."$model.class.php";
 						break;
@@ -668,17 +672,18 @@ class core {
 					$controlfile = '';
 				}
 			}
-			if(empty($controlfile) && empty($conf['disable_plugin'])) {
+			if(empty($controlfile) && empty($conf['plugin_disable'])) {
 				$plugins = core::get_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
 					// 如果有相关的 app path, 这只读取该目录, plugin/xxx/abc_control.class.php, plugin/xxx/admin/abc_control.class.php
 					$path = $conf['plugin_path'].$v.'/';
-					if(is_dir($path.$conf['app_id'])) {
-						$path = $path.$conf['app_id'].'/';
+					if(is_file($path.$conf['app_id'].'/'."{$control}_control.class.php")) {
+						$controlfile = $path.$conf['app_id'].'/'."{$control}_control.class.php";
+						break;
 					}
-					$controlfile = $path."{$control}_control.class.php";
-					if(is_file($controlfile)) {
+					if(is_file($path."{$control}_control.class.php")) {
+						$controlfile =  $path."{$control}_control.class.php";
 						break;
 					} else {
 						$controlfile = '';
