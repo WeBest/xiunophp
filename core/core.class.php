@@ -302,7 +302,8 @@ class core {
 				// 判断错误级别，决定是否退出。
 				
 				if($errno != E_NOTICE) {
-					echo self::json_encode(array('servererror'=>$s));
+					$s = self::json_encode(array('servererror'=>$s));
+					throw new Exception($s);
 					exit;
 				} else {
 					$_SERVER['notice_error'] .= $s;
