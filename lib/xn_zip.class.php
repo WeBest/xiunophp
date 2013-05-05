@@ -467,7 +467,6 @@ class xn_zip {
 		$archive->unzip($zipfile, $tmppath);
 		foreach($archive->files as $file) {
 			// 判断目录是否存在,
-			$path = substr($dir, 0, strrpos($dir, '/'));
 			self::mkdir_by_filename($destpath.$file);
 			copy($tmppath.$file, $destpath.$file);
 			unlink($tmppath.$file);
