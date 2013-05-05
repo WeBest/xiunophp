@@ -453,7 +453,7 @@ class xn_zip {
 	}
 	
 	public static function mkdir_by_filename($filename) {
-		$path = substr($filename, 0, strrpos($dir, '/'));
+		$path = substr($filename, 0, strrpos($filename, '/'));
 		self::mkdir($path);
 	}
 	
