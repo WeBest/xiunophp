@@ -327,6 +327,7 @@ class template {
 			//unset($arr['type'], $arr['value']);
 			$attrs = '';
 			!isset($arr['href']) && $arr['href'] = 'javascript:void(0)';
+			!isset($arr['role']) && $arr['role'] = 'button';
 			foreach($arr as $k=>$v) {
 				// FIX ie6
 				$k == 'onclick' && stripos($v, 'return false') === FALSE && $v .= ";return false;";
