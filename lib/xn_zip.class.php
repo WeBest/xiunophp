@@ -291,7 +291,6 @@ class php_zip {
 		
 		if(substr($to, -1) != "/"){ $to .= "/"; }
 		if(!@is_dir($to)){ @mkdir($to, 0777); }
-		
 		$pth = explode("/", dirname($header['filename']));
 		$pthss = '';
 		for($i=0; isset($pth[$i]); $i++){
@@ -437,6 +436,27 @@ class php_zip {
 
 class xn_zip {
 
+	public static function mkdir($path) {
+		// 查找最后一个 /
+		if(empty($path) || strpos($path, '/') === FALSE || $path == '/') return;
+		if(!is_dir($path)) {
+			// 开始一级级的检测目录
+			$arr = explode('/', $path);
+			$t = array_shift($arr);
+			while($first = array_shift($arr)) {
+				$t .= '/'.$first;
+				if(!is_dir($t)) {
+					mkdir($t, 0777);
+				}
+			}
+		}
+	}
+	
+	public static function mkdir_by_filename($filename) {
+		$path = substr($filename, 0, strrpos($dir, '/'));
+		self::mkdir($path);
+	}
+	
 	public static function unzip($zipfile, $destpath) {
 		$destpath = str_replace('\\', '/', $destpath);
 		substr($destpath, -1, 1) != '/' && $destpath .= '/';
@@ -446,6 +466,9 @@ class xn_zip {
 		!is_dir($tmppath) && mkdir($tmppath, 0777);
 		$archive->unzip($zipfile, $tmppath);
 		foreach($archive->files as $file) {
+			// 判断目录是否存在,
+			$path = substr($dir, 0, strrpos($dir, '/'));
+			self::mkdir_by_filename($destpath.$file);
 			copy($tmppath.$file, $destpath.$file);
 			unlink($tmppath.$file);
 		}
