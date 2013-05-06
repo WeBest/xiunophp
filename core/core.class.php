@@ -527,8 +527,12 @@ class core {
 			!isset($pconf['enable']) && $pconf['enable'] = isset($setting[$v]['enable']) ? $setting[$v]['enable'] : 0;
 			!isset($pconf['installed']) && $pconf['installed'] = isset($setting[$v]['installed']) ? $setting[$v]['installed'] : 0;
 			!isset($pconf['pluginid']) && $pconf['pluginid'] = isset($setting[$v]['pluginid']) ? $setting[$v]['pluginid'] : 0;
+			!isset($pconf['rank']) && $pconf['rank'] = isset($setting[$v]['rank']) ? $setting[$v]['rank'] : 0;
 			$plugins[$v] = $pconf;
 		}
+		//第二次根据 rank 排序
+		misc::arrlist_multisort($plugins, 'rank');
+		
 		return $plugins;
 	}
 
@@ -539,7 +543,7 @@ class core {
 			if($dir == '.' || $dir == '..' || $dir[0] == '.' || !is_dir($path.$dir)) continue;
 			$arr[] = $fullpath ? $path.$dir.'/' : $dir;
 		}
-		sort($arr);// 从低到高排序
+		sort($arr);// 根据名称从低到高排序
 		return $arr;
 		
 	}
