@@ -126,7 +126,7 @@ class core {
 			// throw new Exception('');
 			$gzipon = 0;	
 		}
-		$isfirst = count($_SERVER['ob_stack']) == 1;
+		$isfirst = count($_SERVER['ob_stack']) == 0;
 		
         	if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
 			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU 
