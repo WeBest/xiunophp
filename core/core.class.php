@@ -153,7 +153,11 @@ class core {
         }
 	
 	public static function ob_end_clean() {
-		ob_end_clean();
+		!empty($_SERVER['ob_stack']) && count($_SERVER['ob_stack']) > 0 && ob_end_clean();
+	}
+	
+	public static function ob_clean() {
+		!empty($_SERVER['ob_stack']) && count($_SERVER['ob_stack']) > 0 && ob_clean();
 	}
 	
 	public static function init_set() {
@@ -240,7 +244,7 @@ class core {
 		// 避免死循环
 		DEBUG && $_SERVER['exception'] = 1;
 		
-		core::ob_end_clean();
+		core::ob_clean();
 		
 		log::write($e->getMessage().' File: '.$e->getFile().' ['.$e->getLine().']');
 		
@@ -300,7 +304,7 @@ class core {
 			log::write($s);
 			//$s = preg_replace('# \S*[/\\\\](.+?\.php)#', ' \\1', $s);
 			if(self::gpc('ajax', 'R')) {
-				core::ob_end_clean();
+				core::ob_clean();
 				//$s = preg_replace('#[\\x80-\\xff]{2}#', '?', $s);// 替换掉 gbk， 否则 json_encode 会报错！
 				// 判断错误级别，决定是否退出。
 				

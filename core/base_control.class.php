@@ -39,7 +39,6 @@ class base_control {
 	
 	public function message($msg, $jumpurl = '') {
 		if(core::gpc('ajax')) {
-			core::ob_end_clean();
 			$arr = array('servererror'=>'', 'status'=>1, 'message'=>$msg);
 			echo core::json_encode($arr);
 			exit;
