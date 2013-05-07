@@ -130,14 +130,14 @@ class xn_exception {
 			$message = $arr['message'];
 			$backtracelist = $arr['backtracelist'];
 			
-			ob_start();
+			core::ob_start();
 			if(core::is_cmd()) {
 				include FRAMEWORK_PATH.'errorpage/exception_cmd.htm';
 			} else {
 				include FRAMEWORK_PATH.'errorpage/exception.htm';
 			}
 			$s = ob_get_contents();
-			ob_end_clean();
+			core::ob_end_clean();
 			return $s;
 		} elseif(is_string($e)) {
 			return $e;

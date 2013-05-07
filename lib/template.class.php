@@ -46,12 +46,12 @@ class template {
 		// json 格式，约定为格式。
 		} else {	
 			
+			ob_start();
 			extract($this->vars, EXTR_SKIP);
 			include $this->gettpl($file);
 			$body = ob_get_contents();
-			core::ob_end_clean();
+			ob_end_clean();
 			
-			core::ob_start();
 			$json = array('servererror'=>'', 'status'=>1, 'message'=>array('width'=>400, 'height'=>300, 'pos'=>'center', 'title'=>'默认窗口标题', 'body'=>''));
 			$json['message'] = array_merge($json['message'], $this->json);
 			$this->fetch_json_header($body, $json['message']);

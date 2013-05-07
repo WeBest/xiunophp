@@ -126,8 +126,8 @@ class core {
 			// throw new Exception('');
 			$gzipon = 0;	
 		}
+		error_log('ob_handle:'.$gzipon.", count: ".count($_SERVER['ob_stack'])."\r\n", 3, 'e:/1.txt');
 		$isfirst = count($_SERVER['ob_stack']) == 0;
-		
         	if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
 			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU 
 			$isfirst && header("Content-Encoding: gzip");
@@ -149,6 +149,7 @@ class core {
         	!isset($_SERVER['ob_stack']) && $_SERVER['ob_stack'] = array();
         	array_push($_SERVER['ob_stack'], $gzip);
         	ob_start(array('core', 'ob_handle'));
+        	error_log('ob_start:'.$gzip.", count: ".count($_SERVER['ob_stack'])."\r\n", 3, 'e:/1.txt');
         }
 	
 	public static function ob_end_clean() {
@@ -240,7 +241,6 @@ class core {
 		DEBUG && $_SERVER['exception'] = 1;
 		
 		core::ob_end_clean();
-		core::ob_start(0);
 		
 		log::write($e->getMessage().' File: '.$e->getFile().' ['.$e->getLine().']');
 		
@@ -297,13 +297,10 @@ class core {
 		if(DEBUG && empty($_SERVER['exception'])) {
 			throw new Exception($s);
 		} else {
-			
 			log::write($s);
-			
-			$s = preg_replace('# \S*[/\\\\](.+?\.php)#', ' \\1', $s);
+			//$s = preg_replace('# \S*[/\\\\](.+?\.php)#', ' \\1', $s);
 			if(self::gpc('ajax', 'R')) {
 				core::ob_end_clean();
-				core::ob_start();
 				//$s = preg_replace('#[\\x80-\\xff]{2}#', '?', $s);// 替换掉 gbk， 否则 json_encode 会报错！
 				// 判断错误级别，决定是否退出。
 				
