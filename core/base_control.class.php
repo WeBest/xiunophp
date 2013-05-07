@@ -42,9 +42,9 @@ class base_control {
 			core::ob_end_clean();
 			$arr = array('servererror'=>'', 'status'=>1, 'message'=>$msg);
 			echo core::json_encode($arr);
-			
+			exit;
 		} else {
-			include FRAMEWORK_PATH.'errorpage/message.htm';
+			echo $msg;
 			exit;
 		}
 	}
