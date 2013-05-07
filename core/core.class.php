@@ -120,33 +120,39 @@ class core {
 	}
 	
         public static function ob_handle($s) {
-        	if(!empty($_SERVER['ob_gzip']) && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
-			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU  
-			header("Content-Encoding: gzip");
-			//header("Vary: Accept-Encoding");	// 下载的时候，IE 6 会直接输出脚本名，而不是文件名！非常诡异！估计是压缩标志混乱。
-			header("Content-Length: ".strlen($s));
+        	if(!empty($_SERVER['ob_stack'])) {
+			$gzipon = array_pop($_SERVER['ob_stack']);
+		} else {
+			// throw new Exception('');
+			$gzipon = 0;	
+		}
+		$isfirst = count($_SERVER['ob_stack']) == 1;
+		
+        	if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
+			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU 
+			$isfirst && header("Content-Encoding: gzip");
+			//$isfirst && header("Vary: Accept-Encoding");	// 下载的时候，IE 6 会直接输出脚本名，而不是文件名！非常诡异！估计是压缩标志混乱。
+			$isfirst && header("Content-Length: ".strlen($s));
         	} else {
+        		// PHP 强制发送的 gzip 头
         		if(ini_get('zlib.output_compression')) {
-        			header("Content-Encoding: gzip");
+        			$isfirst && header("Content-Encoding: gzip");
         		} else {
-        			header("Content-Encoding: none");
-               			header("Content-Length: ".strlen($s));
+        			$isfirst && header("Content-Encoding: none");
+               			$isfirst && header("Content-Length: ".strlen($s));
         		}
         	}
         	return $s;
         }
 
         public static function ob_start($gzip = TRUE) {
-        	$_SERVER['ob_gzip'] = $gzip;
+        	!isset($_SERVER['ob_stack']) && $_SERVER['ob_stack'] = array();
+        	array_push($_SERVER['ob_stack'], $gzip);
         	ob_start(array('core', 'ob_handle'));
-        	$_SERVER['ob_start'] = 1;
         }
 	
 	public static function ob_end_clean() {
-		if(!empty($_SERVER['ob_start'])) {
-			ob_end_clean();
-			$_SERVER['ob_start'] = 0;
-		}
+		ob_end_clean();
 	}
 	
 	public static function init_set() {
