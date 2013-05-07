@@ -126,7 +126,6 @@ class core {
 			// throw new Exception('');
 			$gzipon = 0;	
 		}
-		error_log('ob_handle:'.$gzipon.", count: ".count($_SERVER['ob_stack'])."\r\n", 3, 'e:/1.txt');
 		$isfirst = count($_SERVER['ob_stack']) == 0;
         	if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
 			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU 
@@ -149,7 +148,6 @@ class core {
         	!isset($_SERVER['ob_stack']) && $_SERVER['ob_stack'] = array();
         	array_push($_SERVER['ob_stack'], $gzip);
         	ob_start(array('core', 'ob_handle'));
-        	error_log('ob_start:'.$gzip.", count: ".count($_SERVER['ob_stack'])."\r\n", 3, 'e:/1.txt');
         }
 	
 	public static function ob_end_clean() {
