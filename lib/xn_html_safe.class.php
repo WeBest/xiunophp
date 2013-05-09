@@ -1553,7 +1553,11 @@ class HTML_White {
 		return preg_replace_callback('!\+([0-9a-zA-Z/]+)\-!', array($this, 'repackUTF7Callback'), $str);
 	}
 	
-	private function repackUTF7Callback($str) {
+	function repackUTF7Back($str) {
+		return $str[1].'+'.rtrim(base64_encode($str[2]), '=').'-';
+	}
+
+	public function repackUTF7Callback($str) {
 		$str = base64_decode($str[1]);
 		$str = preg_replace_callback('/^((?:\x00.)*)((?:[^\x00].)+)/', array($this, 'repackUTF7Back'), $str);
 		return preg_replace('/\x00(.)/', '$1', $str);
