@@ -72,8 +72,8 @@ class template {
 			// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 			$file = '';
 			foreach($this->conf['view_path'] as $path) {
-				if(is_file($path.'/'.$filename)) {
-					$file = $path.'/'.$filename;
+				if(is_file($path.$filename)) {
+					$file = $path.$filename;
 					break;
 				}
 			}
