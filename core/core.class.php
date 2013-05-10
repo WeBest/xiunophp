@@ -532,7 +532,7 @@ class core {
 			!isset($pconf['enable']) && $pconf['enable'] = isset($setting[$v]['enable']) ? $setting[$v]['enable'] : 0;
 			!isset($pconf['installed']) && $pconf['installed'] = isset($setting[$v]['installed']) ? $setting[$v]['installed'] : 0;
 			!isset($pconf['pluginid']) && $pconf['pluginid'] = isset($setting[$v]['pluginid']) ? $setting[$v]['pluginid'] : 0;
-			!isset($pconf['rank']) && $pconf['rank'] = isset($setting[$v]['rank']) ? $setting[$v]['rank'] : 0;
+			!isset($pconf['rank']) && $pconf['rank'] = isset($setting[$v]['rank']) ? $setting[$v]['rank'] : 100; // 按照正序排序
 			$plugins[$v] = $pconf;
 		}
 		//第二次根据 rank 排序
