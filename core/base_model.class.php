@@ -328,8 +328,8 @@ class base_model {
 		if(!empty($this->maxcol)) {
 			if(!isset($arr[$this->maxcol])) {
 				$arr[$this->maxcol] = $this->maxid('+1');	// 自增
-				$this->count('+1');
 			}
+			$this->count('+1');
 			$key = $this->get_key($arr);
 			if($this->set($key, $arr)) {
 				$this->unique[$key] = $arr;
