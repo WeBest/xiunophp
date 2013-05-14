@@ -109,9 +109,9 @@ class misc {
 		$port = core::gpc('SERVER_PORT', 'S');
 		//$portadd = ($port == 80 ? '' : ':'.$port);
 		$host = core::gpc('HTTP_HOST', 'S');	// host 里包含 port
-		//$schme = self::gpc('SERVER_PROTOCOL', 'S');
-		$path = substr(core::gpc('PHP_SELF', 'S'), 0, strrpos(core::gpc('PHP_SELF', 'S'), '/'));
-		return  "http://$host$path/";
+		$path = substr(self::gpc('PHP_SELF', 'S'), 0, strrpos(self::gpc('PHP_SELF', 'S'), '/'));
+		$http = (($port == 443) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')) ? 'https' : 'http';
+		return  "$http://$host$portadd$path/";
 	}
 	
 	// 返回格式：http://www.domain.com/path/script.php?a=b&c=d
@@ -130,7 +130,8 @@ class misc {
 		} else {
 			$request_uri = $_SERVER['REQUEST_URI'];
 		}
-		return  "http://$host".$request_uri;
+		$http = (($port == 443) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')) ? 'https' : 'http';
+		return  "$http://$host".$request_uri;
 		//if(isset($_SERVER['SCRIPT_URI']) && 0) {
 		//	return $_SERVER['SCRIPT_URI'];// 会漏掉 query_string, .core::gpc('QUERY_STRING', 'S');
 		//}

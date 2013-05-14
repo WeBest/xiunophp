@@ -503,16 +503,6 @@ class core {
 		
 		return $s;
 	}
-
-	public static function get_url_path() {
-		$port = self::gpc('SERVER_PORT', 'S');
-		$portadd = $port == 80 ? '' : ':80';
-		$host = self::gpc('HTTP_HOST', 'S');
-		//$schme = self::gpc('SERVER_PROTOCOL', 'S');
-		$path = substr(self::gpc('PHP_SELF', 'S'), 0, strrpos(self::gpc('PHP_SELF', 'S'), '/'));
-		$http = (($port == 443) || (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] != 'off')) ? 'https' : 'http';
-		return  "$http://$host$portadd$path/";
-	}
 	
 	// 获取已经开启的 plugin, ，专门用来扫描插件目录
 	public static function get_plugins(&$conf, $force = 0) {
