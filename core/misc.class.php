@@ -193,6 +193,34 @@ class misc {
 		return $n;
 	}
 	
+	/*
+	for ($i = 0; $i < strlen($string); $i++) {
+	    echo dechex(ord($string[$i]));
+	}
+	*/
+	public static function hexdump($data, $newline = "\n") {
+		static $from = '';
+		static $to = '';
+
+		static $width = 16; // 每行宽度
+		static $pad = '.';
+		if($from === '') {
+			for($i=0; $i <= 0xFF; $i++) {
+				$from .= chr($i);
+				$to .= ($i >= 0x20 && $i <= 0x7E) ? chr($i) : $pad;
+			}
+		}
+
+		$hex = str_split(bin2hex($data), $width * 2);
+		$chars = str_split(strtr($data, $from, $to), $width);
+
+		$offset = 0;
+		foreach($hex as $i => $line) {
+			echo sprintf('%6X',$offset).' : '.implode(' ', str_split($line, 2)).' ['.$chars[$i].']'.$newline;
+			$offset += $width;
+		}
+	}
+	
 	public static function array_to_urladd($arr) {
 		$s = '';
 		foreach((array)$arr as $k=>$v) {

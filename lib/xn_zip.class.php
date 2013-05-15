@@ -256,6 +256,7 @@ class php_zip {
 		$binary_data = fread($zip, 30);
 		$data		= unpack('vchk/vid/vversion/vflag/vcompression/vmtime/vmdate/Vcrc/Vcompressed_size/Vsize/vfilename_len/vextra_len', $binary_data);
 
+		$header = array();
 		$header['filename']		= fread($zip, $data['filename_len']);
 		$header['extra']		   = ($data['extra_len'] != 0) ? fread($zip, $data['extra_len']) : '';
 		$header['compression']	 = $data['compression'];
@@ -339,13 +340,19 @@ class php_zip {
 				$binary_data = pack('VV', $header['crc'], $header['size']);
 				fwrite($fp, $binary_data, 8);
 				fclose($fp);
+
+				$gzfile = $to.$header['filename'].'.gz';
+				$s = file_get_contents($gzfile);
+				$unzipdata = $this->compatible_gzinflate($s);
+				file_put_contents($unzipdata, $to.$header['filename']);
 				
+				/*
 				$gzp = gzopen($to.$header['filename'].'.gz', 'rb');// or die("gzopen failed: $to$header[filename].gz");
 				if(!$gzp){ return(-2); }
 				$fp = @fopen($to.$header['filename'], 'wb');
 				if(!$fp){ return(-1); }
 				$size = $header['size'];
-				
+				echo $size;exit;
 				while($size != 0)
 				{
 					$read_size   = ($size < 2048 ? $size : 2048);
@@ -354,7 +361,7 @@ class php_zip {
 					@fwrite($fp, $binary_data, $read_size);
 					$size	   -= $read_size;
 				}
-				fclose($fp); gzclose($gzp);
+				fclose($fp); gzclose($gzp);*/
 				
 				//@file_put_contents($to.$header['filename'], $binary_data);
 				@unlink($to.$header['filename'].'.gz');
@@ -363,6 +370,30 @@ class php_zip {
 		return true;
 	}
 	
+	private function compatible_gzinflate($gzData) {
+		
+		if ( substr($gzData, 0, 3) == "\x1f\x8b\x08" ) {
+			$i = 10;
+			$flg = ord( substr($gzData, 3, 1) );
+			if ( $flg > 0 ) {
+				if ( $flg & 4 ) {
+					list($xlen) = unpack('v', substr($gzData, $i, 2) );
+					$i = $i + 2 + $xlen;
+				}
+				if ( $flg & 8 )
+					$i = strpos($gzData, "\0", $i) + 1;
+				if ( $flg & 16 )
+					$i = strpos($gzData, "\0", $i) + 1;
+				if ( $flg & 2 )
+					$i = $i + 2;
+			}
+			return gzinflate( substr($gzData, $i, -8) );
+		} else {
+			return FALSE;
+		}
+	}
+	
+
 	private function do_unzip($zipfile, $to, $index = Array(-1)) {
 		$ok  = 0;
 		$zip = @fopen($zipfile, 'rb');
