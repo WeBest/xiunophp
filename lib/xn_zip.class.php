@@ -317,7 +317,8 @@ class php_zip {
 					$size	   -= $read_size;
 				}
 				fclose($fp);
-				//@file_put_contents($to.$header['filename'], $header['mtime']);
+				// 改变文件时间
+				touch($to.$header['filename'], $header['mtime']);
 			
 			}else{
 				
@@ -341,12 +342,13 @@ class php_zip {
 				fwrite($fp, $binary_data, 8);
 				fclose($fp);
 
+				// 此处存在兼容性问题，在php5.3 下有问题，由 xiuno 修正。
 				$gzfile = $to.$header['filename'].'.gz';
 				$s = file_get_contents($gzfile);
 				$unzipdata = $this->compatible_gzinflate($s);
-				file_put_contents($unzipdata, $to.$header['filename']);
+				file_put_contents($to.$header['filename'], $unzipdata);
 				
-				/*
+				/* old code
 				$gzp = gzopen($to.$header['filename'].'.gz', 'rb');// or die("gzopen failed: $to$header[filename].gz");
 				if(!$gzp){ return(-2); }
 				$fp = @fopen($to.$header['filename'], 'wb');
@@ -361,9 +363,9 @@ class php_zip {
 					@fwrite($fp, $binary_data, $read_size);
 					$size	   -= $read_size;
 				}
-				fclose($fp); gzclose($gzp);*/
+				fclose($fp); gzclose($gzp);
+				*/
 				
-				//@file_put_contents($to.$header['filename'], $binary_data);
 				@unlink($to.$header['filename'].'.gz');
 			}
 		}
