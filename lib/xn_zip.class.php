@@ -322,7 +322,7 @@ class php_zip {
 				
 				$fp = fopen($to.$header['filename'].'.gz', 'wb');
 				if(!$fp){ return(-1); }
-				$binary_data = pack('va1a1Va1a1', 0x8b1f, Chr($header['compression']), Chr(0x00), time(), Chr(0x00), Chr(3));
+				$binary_data = pack('va1a1Va1a1', 0x8b1f, chr($header['compression']), chr(0x00), time(), chr(0x00), chr(3));
 				
 				fwrite($fp, $binary_data, 10);
 				$size = $header['compressed_size'];
