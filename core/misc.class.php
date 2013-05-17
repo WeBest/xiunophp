@@ -447,44 +447,7 @@ class misc {
 		$w = stream_get_wrappers();
 		$allow_url_fopen = strtolower(ini_get('allow_url_fopen'));
 		$allow_url_fopen = (empty($allow_url_fopen) || $allow_url_fopen == 'off') ? 0 : 1;
-		if($allow_url_fopen && empty($post) && empty($cookie) && in_array('http', $w)) {
-			// 尝试连接
-			$opts = array ('http'=>array('method'=>'GET', 'timeout'=>$timeout)); 
-			$context = stream_context_create($opts);  
-			$html = file_get_contents($url, false, $context);  
-			return $html;
-		} elseif(function_exists('curl_init') && empty($cookie)) {
-			$ch = curl_init();
-			curl_setopt($ch, CURLOPT_URL, $url);
-			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-			curl_setopt($ch, CURLOPT_HEADER, 1);
-			if($post) {
-				curl_setopt($ch, CURLOPT_POST, 1);
-				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
-			}
-			$data = curl_exec($ch);
-			
-			if(curl_errno($ch)) {
-				throw new Exception('Errno'.curl_error($ch));//捕抓异常
-			}
-			if(!$data) {
-				curl_close($ch);
-				return '';
-			}
-			
-			list($header, $data) = explode("\r\n\r\n", $data);
-			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
-			if($http_code == 301 || $http_code == 302) {
-				$matches = array();
-				preg_match('/Location:(.*?)\n/', $header, $matches);
-				$url = trim(array_pop($matches));
-				curl_setopt($ch, CURLOPT_URL, $url);
-				curl_setopt($ch, CURLOPT_HEADER, false);
-				$data = curl_exec($ch);
-			}
-			curl_close($ch);
-			return $data;  
-		} elseif(function_exists('fsockopen')) {
+		if(function_exists('fsockopen')) {
 			$limit = 500000;
 			$ip = '';
 			$return = '';
@@ -553,6 +516,43 @@ class misc {
 				@fclose($fp);
 				return $return;
 			}
+		} elseif(function_exists('curl_init') && empty($cookie)) {
+			$ch = curl_init();
+			curl_setopt($ch, CURLOPT_URL, $url);
+			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+			curl_setopt($ch, CURLOPT_HEADER, 1);
+			if($post) {
+				curl_setopt($ch, CURLOPT_POST, 1);
+				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+			}
+			$data = curl_exec($ch);
+			
+			if(curl_errno($ch)) {
+				throw new Exception('Errno'.curl_error($ch));//捕抓异常
+			}
+			if(!$data) {
+				curl_close($ch);
+				return '';
+			}
+			
+			list($header, $data) = explode("\r\n\r\n", $data);
+			$http_code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+			if($http_code == 301 || $http_code == 302) {
+				$matches = array();
+				preg_match('/Location:(.*?)\n/', $header, $matches);
+				$url = trim(array_pop($matches));
+				curl_setopt($ch, CURLOPT_URL, $url);
+				curl_setopt($ch, CURLOPT_HEADER, false);
+				$data = curl_exec($ch);
+			}
+			curl_close($ch);
+			return $data;  
+		} elseif($allow_url_fopen && empty($post) && empty($cookie) && in_array('http', $w)) {
+			// 尝试连接
+			$opts = array ('http'=>array('method'=>'GET', 'timeout'=>$timeout)); 
+			$context = stream_context_create($opts);  
+			$html = file_get_contents($url, false, $context);  
+			return $html;
 		} else {
 			log::write('fetch_url() failed: '.$url);
 			return FALSE;
