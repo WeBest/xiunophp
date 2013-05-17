@@ -395,7 +395,9 @@ class misc {
 			return self::fetch_url($url, $timeout);
 		}
 		$w = stream_get_wrappers();
-		if(extension_loaded('openssl') && in_array('https', $w) && ini_get('allow_url_fopen')) {
+		$allow_url_fopen = strtolower(ini_get('allow_url_fopen'));
+		$allow_url_fopen = (empty($allow_url_fopen) || $allow_url_fopen == 'off') ? 0 : 1;
+		if(extension_loaded('openssl') && in_array('https', $w) && $allow_url_fopen) {
 			return file_get_contents($url);
 		} elseif (!function_exists('curl_init')) {
 			throw new Exception('server not installed curl.');
@@ -443,7 +445,9 @@ class misc {
 		}
 		
 		$w = stream_get_wrappers();
-		if(ini_get('allow_url_fopen') && empty($post) && empty($cookie) && in_array('http', $w)) {
+		$allow_url_fopen = strtolower(ini_get('allow_url_fopen'));
+		$allow_url_fopen = (empty($allow_url_fopen) || $allow_url_fopen == 'off') ? 0 : 1;
+		if($allow_url_fopen && empty($post) && empty($cookie) && in_array('http', $w)) {
 			// 尝试连接
 			$opts = array ('http'=>array('method'=>'GET', 'timeout'=>$timeout)); 
 			$context = stream_context_create($opts);  
