@@ -436,6 +436,7 @@ class misc {
 
 	// SAE 重载了 file_get_contents()
 	public static function fetch_url($url, $timeout = 5, $post = '', $cookie = '', $deep = 0) {
+		$a = $b;
 		if($deep > 5) throw new Exception('超出 fetch_url() 最大递归深度！');
 		if(substr($url, 0, 5) == 'https') {
 			return self::https_fetch_url($url, $timeout);

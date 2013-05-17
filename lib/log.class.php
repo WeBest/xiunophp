@@ -30,12 +30,14 @@ class log {
 		}
 		$logpath = FRAMEWORK_LOG_PATH;
 		$logfile = $logpath.$file;
-		$fp = fopen($logfile, 'ab+');
-		if(!$fp) {
-			throw new Exception('写入日志失败，可能磁盘已满，或者文件'.$logfile.'不可写。');
-		}
-		fwrite($fp, $s);
-		fclose($fp);
+		try {
+			$fp = fopen($logfile, 'ab+');
+			if(!$fp) {
+				throw new Exception('写入日志失败，可能磁盘已满，或者文件'.$logfile.'不可写。');
+			}
+			fwrite($fp, $s);
+			fclose($fp);
+		} catch (Exception $e) {}
 		return TRUE;
 	}
 	
