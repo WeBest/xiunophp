@@ -140,7 +140,7 @@ class template {
 		}
 		
 		// 美化 button, 自动转换 <input class="button" ... /> 为 <a><span></span></a>
-		$s = $this->convert_button($s);
+		!empty($this->conf['view_convert_button']) && $s = $this->convert_button($s);
 		
 		// 去掉 if(0) /if
 		
