@@ -648,7 +648,7 @@ class core {
 			header("Cache-Control: private, post-check=0, pre-check=0, max-age=0");
 			header("Pragma: no-cache");
 			header('Content-Type: text/html; charset=UTF-8');
-			header('X-Powered-By: XiunoPHP;');
+			header('X-Powered-By: XiunoPHP;'); // 隐藏 PHP 版本 X-Powered-By: PHP/5.2.5
 		}
 		
 	}
