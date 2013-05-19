@@ -3352,14 +3352,16 @@ class xn_mail {
 		$smtp = array('host'=>'smtp.163.com', 'port'=>25, 'user'=>'zhangsan', 'pass'=>'123456');
 		xn_mail::send($smtp, $username, $email, $subject, $message);
 	*/
-	public static function send($smtp, $username, $email, $subject, $message) {
+	public static function send($smtp, $username, $email, $subject, $message, $charset = 'GBK') {
 		// 部分 SMTP 不支持UTF-8
+		/*
 		if(in_array($smtp, array('smtp.126.com', 'smtp.163.com'))) {
 			$charset = 'GBK';
 		} else {
 			$charset = 'UTF-8';
 		}
-		$charset = 'UTF-8';
+		$charset = 'GBK';
+		*/
 		$mail             = new PHPMailer();
 		//$mail->PluginDir = FRAMEWORK_PATH.'lib/';
 		$mail->IsSMTP(); // telling the class to use SMTP
@@ -3377,11 +3379,12 @@ class xn_mail {
 		
 		$mail->Encoding   = 'base64';
 		
-		$subject = $charset == 'GBK' ? iconv('UTF-8', 'GBK', $subject) : $subject;
-		$message = $charset == 'GBK' ? iconv('UTF-8', 'GBK', $message) : $message;
+		//$subject = $charset == 'UTF-8' ? iconv('UTF-8', 'GBK', $subject) : $subject;
+		//$message = $charset == 'UTF-8' ? iconv('UTF-8', 'GBK', $message) : $message;
+		//$username = $charset == 'UTF-8' ? iconv('UTF-8', 'GBK', $username) : $username;
 		//$fromemail = $this->conf['reg_email_user'].'@'.$this->conf['reg_email_host'];
 		
-		$mail->SetFrom($smtp['email'], $email);
+		$mail->SetFrom($smtp['email'], $username);
 		$mail->AddReplyTo($smtp['email'], $email);
 		$mail->Subject    = $subject;
 		$mail->AltBody    = $message; // optional, comment out and test
