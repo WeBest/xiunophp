@@ -322,7 +322,9 @@ class misc {
 	
 	// 转换空白字符, $onlytab 仅仅转换 \t
 	public static function html_space($s) {
-		$s = str_replace(' ', '&nbsp;', $s);
+		$s = str_replace('  ', ' &nbsp;', $s);
+		$s = str_replace('  ', ' &nbsp;', $s);
+		$s = str_replace('  ', ' &nbsp;', $s);
 		$s = str_replace("\t", '&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; ', $s);
 		$s = str_replace("\r\n", "\n", $s);
 		$s = str_replace("\n", "<br />", $s);
