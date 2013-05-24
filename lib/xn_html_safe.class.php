@@ -1584,7 +1584,7 @@ class xn_html_safe {
 			'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot','caption',
 			'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'menu', 'multicol',
 			'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'p', 'div', 'pre',
-			'br', 'img', 'area', 'embed',
+			'br', 'img', 'area',  'embed', 'iframe',
 		);
 		$white_value = array(
 			'href'=>array('pcre', '', array(self::$pattern['url'], self::$pattern['ed2k_url'])),
@@ -1604,6 +1604,7 @@ class xn_html_safe {
 			'value'=>array('list', '', array('#^[\w+/\-]$#')),
 			'cellspacing'=>array('range', 0, array(0, 10)),
 			'cellpadding'=>array('range', 0, array(0, 10)),
+			'frameborder'=>array('range', 0, array(0, 10)),
 			'align'=>array('list', 'left', array('left', 'center', 'right')),
 			'valign'=>array('list', 'middle', array('middle', 'top', 'bottom')),
 		);
