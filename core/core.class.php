@@ -401,7 +401,7 @@ class core {
 		
 		$get = &$_GET;
 		$r = substr($r, strrpos($r, '/') + 1);				//第[1]步
-		substr($r, 0, 9) == 'index.php' && $r = substr($r, 9);
+		strtolower(substr($r, 0, 9)) == 'index.php' && $r = substr($r, 9);
 		substr($r, 0, 1) == '?' && $r = substr($r, 1);
 
 		//$r = preg_replace('#^/?([^/]+/(index\.php)?\??)*#', '', $r);	//第[1]步
