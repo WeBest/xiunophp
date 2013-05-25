@@ -248,7 +248,7 @@ class db_pdo_mysql implements db_interface {
 		$set = $this->arr_to_sqladd($update);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		return $this->exec("UPDATE $sqladd $table SET $set $where");
+		return $this->exec("UPDATE $sqladd $table SET $set $where", $this->wlink);
 	}
 	
 	// 根据条件删除，不鼓励使用。
@@ -256,21 +256,21 @@ class db_pdo_mysql implements db_interface {
 		$where = $this->cond_to_sqladd($cond);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		return $this->exec("DELETE $lowprority FROM $table $where");
+		return $this->exec("DELETE $lowprority FROM $table $where", $this->wlink);
 	}
 	
 	public function index_create($table, $index) {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)");
+		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)", $this->wlink);
 	}
 	
 	public function index_drop($table, $index) {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table DROP INDEX $keyname");
+		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->wlink);
 	}
 	
 	// 返回的是结果集，判断是否为写入
