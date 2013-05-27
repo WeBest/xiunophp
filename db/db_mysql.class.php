@@ -267,7 +267,7 @@ class db_mysql implements db_interface {
 		$set = $this->arr_to_sqladd($update);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		$this->query("UPDATE $sqladd $table SET $set $where");
+		$this->query("UPDATE $sqladd $table SET $set $where", $this->wlink);
 		return mysql_affected_rows($this->wlink);
 	}
 	
@@ -276,7 +276,7 @@ class db_mysql implements db_interface {
 		$where = $this->cond_to_sqladd($cond);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		$this->query("DELETE $sqladd FROM $table $where");
+		$this->query("DELETE $sqladd FROM $table $where", $this->wlink);
 		return mysql_affected_rows($this->wlink);
 	}
 	
@@ -315,7 +315,7 @@ class db_mysql implements db_interface {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)");
+		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)", $this->wlink);
 	}
 	
 	// 删除索引
@@ -323,7 +323,7 @@ class db_mysql implements db_interface {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table DROP INDEX $keyname");
+		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->wlink);
 	}
 
 	// -------------> 公共方法，非公开接口
