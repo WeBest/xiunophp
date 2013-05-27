@@ -1596,7 +1596,7 @@ class xn_html_safe {
 			'face'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
 			'target'=>array('list', '_self', array('_blank', '_self')),
-			'class'=>array('pcre', '', array('#^((quote)|(brush:\w+;?\s*(tab\-size:\d+)?))$#is')),
+			'class'=>array('pcre', '', array('#^((code|quote)|(brush:\w+;?\s*(tab\-size:\d+)?))$#is')),
 			'type'=>array('pcre', '', array('#^[\w/\-]+$#')),
 			'allowfullscreen'=>array('list', 'true', array('true', '1', 'on')),
 			'wmode'=>array('list', 'transparent', array('transparent', '')),
