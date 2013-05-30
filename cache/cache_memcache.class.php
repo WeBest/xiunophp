@@ -39,12 +39,11 @@ class cache_memcache implements cache_interface {
 				throw new Exception('PHP.ini Error: Memcache extension not loaded.');
 			}
 	 		if($this->memcache->connect($this->conf['host'], $this->conf['port'])) {
+	 			$this->support_getmulti = !empty($this->conf['multi']) || method_exists($this->memcache, 'getMulti');
 	 			return $this->memcache;
 	 		} else {
 	 			throw new Exception('Can not connect to Memcached host.');
 	 		}
-	 		
-	 		$this->support_getmulti = $this->conf['multi'] || method_exists($this->memcache, 'getMulti');
 		}
 	}
 
