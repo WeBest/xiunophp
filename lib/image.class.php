@@ -15,14 +15,19 @@ class image {
 			'fileurl' => '001/0123/1233.jpg'
 		);
 	*/
-	public static function safe_thumb($sourcefile, $id, $ext, $dir1, $forcedwidth, $forcedheight) {
+	public static function safe_thumb($sourcefile, $id, $ext, $dir1, $forcedwidth, $forcedheight, $randomname = 0) {
 		$dir2 = self::set_dir($id, $dir1);
-		$filepath = "$dir1$dir2/$id$ext";
+		$filename = $randomname ? md5(rand(0, 1000000000).$_SERVER['time'].$_SERVER['ip']).$ext : $id.$ext;
+		$filepath = "$dir1$dir2/$filename";
 		$arr = self::thumb($sourcefile, $filepath, $forcedwidth, $forcedheight);
-		$arr['fileurl'] = "$dir2/$id$ext";
+		$arr['fileurl'] = "$dir2/$filename";
 		return $arr;
 	}
-
+	
+	public static function ext($filename) {
+		return strtolower(substr(strrchr($filename, '.'), 1));
+	}
+	
 	/** 
 		实例：
 	 	thumb(APP_PATH.'xxx.jpg', APP_PATH.'xxx_thumb.jpg', 200, 200);
@@ -33,7 +38,7 @@ class image {
 	public static function thumb($sourcefile, $destfile, $forcedwidth = 80, $forcedheight = 80) {
 		$return = array('filesize'=>0, 'width'=>0, 'height'=>0);
 		$imgcomp = 15;
-		$destext = strtolower(substr(strrchr($destfile, '.'), 1));
+		$destext = self::ext($destfile);
 		if(!in_array($destext, array('gif', 'jpg', 'bmp', 'png'))) {
 			return $return;
 		}
