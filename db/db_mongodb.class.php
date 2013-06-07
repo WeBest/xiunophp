@@ -234,7 +234,7 @@ class db_mongodb implements db_interface {
 		// todo: 未测试
 		$cursor = $coll->find(array(), array("$col"=>1))->sort(array("$col"=>-1))->limit(1);
 		$arr = $cursor->getNext();
-		return empty($arr["$col"]) ? intval($arr["$col"]) : 0;
+		return !empty($arr["$col"]) ? intval($arr["$col"]) : 0;
 	}
 	
 	public function index_count($table, $cond = array()) {

@@ -296,6 +296,9 @@ class db_mysql implements db_interface {
 		$tablename = $this->tablepre.$table;
 		$where = $this->cond_to_sqladd($cond);
 		$arr = $this->fetch_first("SELECT COUNT(*) AS num FROM $tablename $where");
+		if(!isset($arr['num'])) {
+			throw new Exception("get count from $tablename Failed!");
+		}
 		return isset($arr['num']) ? intval($arr['num']) : 0;
 	}
 	
@@ -305,6 +308,9 @@ class db_mysql implements db_interface {
 		list($table, $col) = explode('-', $key);
 		$tablename = $this->tablepre.$table;
 		$arr = $this->fetch_first("SELECT MAX($col) AS num FROM $tablename");
+		if(!isset($arr['num'])) {
+			throw new Exception("get maxid from $tablename Failed!");
+		}
 		return isset($arr['num']) ? intval($arr['num']) : 0;
 	}
 	
