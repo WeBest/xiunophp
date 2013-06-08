@@ -27,7 +27,7 @@ class cache_ea implements cache_interface {
 		if(is_array($key)) {
 			foreach($key as $k) {
 				$arr = eaccelerator_get($k);
-				$arr && $data[$k] = $arr;
+				$data[$k] = $arr;
 			}
 			return $data;
 		} else {

@@ -26,7 +26,7 @@ class cache_apc implements cache_interface {
 		if(is_array($key)) {
 			foreach($key as $k) {
 				$arr = apc_fetch($k);
-				$arr && $data[$k] = $arr;
+				$data[$k] = $arr;
 			}
 			return $data;
 		} else {
