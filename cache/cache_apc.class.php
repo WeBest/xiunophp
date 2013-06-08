@@ -41,8 +41,8 @@ class cache_apc implements cache_interface {
 	
 	public function update($key, $value) {
 		$arr = $this->get($key);
-		if(!empty($arr)) {
-			$arr = array_merge($arr, $value);
+		if($arr !== FALSE) {
+			is_array($arr) && is_array($value) && $arr = array_merge($arr, $value);
 			return $this->set($key, $arr);
 		}
 		return 0;
