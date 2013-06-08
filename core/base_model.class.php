@@ -444,15 +444,16 @@ class base_model {
 	// 2.4 新增接口，按照条件更新，不鼓励使用
 	public function index_update($cond, $update, $lowprority = FALSE) {
 		// 清空当前model的缓存
+		// 影响的行数
+		$n = $lowprority ? $this->index_count($cond) : 0;
+		$m = 0;
 		if(!empty($this->conf['cache']['enable'])) {
-			$n = $this->index_count($cond);
 			if($n == 0) return 0;
 			// 清空缓存
 			if($n > 2000) {
 				$this->unique = array();
 				$this->cache->flush();
-				$n = $this->db->index_update($this->table, $cond, $update, $lowprority);
-				return $n;
+				$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 			// 一条一条的删除
 			} else {
 				$keys = $this->index_fetch_id($cond);
@@ -460,29 +461,32 @@ class base_model {
 					unset($this->unique[$key]);
 					$this->cache_delete($key);
 				}
-				return $n;
+				$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 			}
 		} else {
 			$this->unique = array();
-			$n = $this->db->index_update($this->table, $cond, $update, $lowprority);
-			return $n;
+			$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 		}
 		
+		$n = $lowprority ? $n : $m;
+		return $n;
 	}
 	
 	// 2.4 新增接口，按照条件删除，不鼓励使用
 	public function index_delete($cond, $lowprority = FALSE) {
 		// 清空当前model的缓存
-		$n = 0; // 影响的行数
+		
+		// 影响的行数
+		$n = $lowprority ? $this->index_count($cond) : 0;
+		$m = 0;
 		if(!empty($this->conf['cache']['enable'])) {
 			// 判断影响的行数，如果超过2000行，则清空缓存，否则一条一条的删除
-			$n = $this->index_count($cond);
 			if($n == 0) return 0;
 			// 清空缓存
 			if($n > 2000) {
 				$this->unique = array();
 				$this->cache->flush();
-				$n = $this->db->index_delete($this->table, $cond, $lowprority);
+				$m = $this->db->index_delete($this->table, $cond, $lowprority);
 			// 一条一条的删除
 			} else {
 				$keys = $this->index_fetch_id($cond);
@@ -493,12 +497,14 @@ class base_model {
 				if(!empty($this->maxcol)) {
 					$this->count('-'.$n);
 				}
+				$m = $this->db->index_delete($this->table, $cond, $lowprority);
 			}
 		} else {
 			$this->unique = array();
-			$n = $this->db->index_delete($this->table, $cond, $lowprority);
+			$m = $this->db->index_delete($this->table, $cond, $lowprority);
 		}
-		if(!$lowprority && $n > 0) {
+		$n = $lowprority ? $n : $m;
+		if($n > 0) {
 			$this->count('-'.$n);
 		}
 		return $n;
