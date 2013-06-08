@@ -52,7 +52,12 @@ class cache_memcache implements cache_interface {
 		if(is_array($key)) {
 			// 安装的时候要判断 Memcached 版本！ getMulti()
 			if($this->support_getmulti) {
-				return $this->memcache->getMulti($key);
+				$arrlist = $this->memcache->getMulti($key);
+				// 会丢失 key!，补上 key
+				foreach($key as $k) {
+					!isset($arrlist[$k]) && $arrlist[$k] = FALSE;
+				}
+				return $arrlist;
 			} else {
 				foreach($key as $k) {
 					$arr = $this->memcache->get($k);

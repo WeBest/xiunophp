@@ -200,6 +200,13 @@ class base_model {
 				}
 				return $arrlist;
 			} else {
+				// 检查缺失，如果为 FALSE 这表示缓存里没有
+				foreach($arr as $k=>&$v) {
+					if($v === FALSE) {
+						$v = $this->db_get($k);
+						$this->cache_set($k, $v);
+					}
+				}
 				return $arr;
 			}
 		} else {
