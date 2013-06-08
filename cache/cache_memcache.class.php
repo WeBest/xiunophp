@@ -61,7 +61,7 @@ class cache_memcache implements cache_interface {
 			} else {
 				foreach($key as $k) {
 					$arr = $this->memcache->get($k);
-					$arr && $data[$k] = $arr;
+					$data[$k] = $arr;
 				}
 				return $data;
 			}
