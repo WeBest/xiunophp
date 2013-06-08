@@ -175,7 +175,7 @@ class base_model {
 		return $this->get_cache_instance($key)->set($key, $data);
 	}
 	
-	public function cache_update($key) {
+	public function cache_update($key, $data) {
 		return $this->get_cache_instance($key)->update($key, $data);
 	}
 	
