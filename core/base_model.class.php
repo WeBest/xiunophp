@@ -65,6 +65,7 @@ class base_model {
 
 	// 当前应用的配置
 	public $conf = array();			// 配置文件，包含各种选项，实际是全局的 $conf
+	public $arg_conf = array();		// 用来保存从参数传递过来的配置参数。
 
 	// 如果需要自动加载model，必须指定这三项！
 	public $table;				// 用来标示 table
@@ -79,6 +80,7 @@ class base_model {
 	private $unique;			// 唯一键数组，用来防止重复查询
 	function __construct(&$conf) {
 		$this->conf = &$conf;		// 此处引用。因为多个model，可能每个model有自己的db, cache 服务器
+		$this->old_conf = array();	// 原始的 $conf，默认为空，一旦被指定，则优先加载此项。
 	}
 
 	function __get($var) {
@@ -90,7 +92,12 @@ class base_model {
 			return $this->$var;
 		} else {
 			// 遍历全局的 conf，包含 model
-			$this->$var = core::model($this->conf, $var);
+			if(!empty($this->old_conf)) {
+				$conf = &$this->old_conf;
+			} else {
+				$conf = &$this->conf;
+			}
+			$this->$var = core::model($conf, $var);
 			if(!$this->$var) {
 				throw new Exception('Not found model:'.$var);
 			}
