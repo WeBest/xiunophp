@@ -279,18 +279,7 @@ class db_mysql implements db_interface {
 		$this->query("DELETE $sqladd FROM $table $where", $this->wlink);
 		return mysql_affected_rows($this->wlink);
 	}
-	
-	/*
-	public function fetch_all($sql) {
-		$return = $data = array();
-		$result = $this->query($sql, $this->rlink);
-		while($data = mysql_fetch_assoc($result)) {
-			$return[] = $data;
-		}
-		return $return;
-	}
-	*/
-	
+		
 	// 原生的 count
 	public function index_count($table, $cond = array()) {
 		$tablename = $this->tablepre.$table;
@@ -337,6 +326,16 @@ class db_mysql implements db_interface {
 		empty($link) && $link = $this->rlink;
 		$result = $this->query($sql, $link);
 		return mysql_fetch_assoc($result);
+	}
+	
+	public function fetch_all($sql, $link = NULL) {
+		empty($link) && $link = $this->rlink;
+		$return = $data = array();
+		$result = $this->query($sql, $link);
+		while($data = mysql_fetch_assoc($result)) {
+			$return[] = $data;
+		}
+		return $return;
 	}
 	
 	public function query($sql, $link = NULL) {

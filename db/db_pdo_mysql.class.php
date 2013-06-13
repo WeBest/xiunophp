@@ -346,6 +346,21 @@ class db_pdo_mysql implements db_interface {
 		}
 	}
 	
+	public function fetch_all($sql, $link = NULL) {
+		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
+		empty($link) && $link = $this->rlink;
+		$result = $link->query($sql);
+		if($result) {
+			$result->setFetchMode(PDO::FETCH_ASSOC);
+			$return = array();
+			$datalist = $result->fetchAll();
+			return $datalist;
+		} else {
+			$error = $link->errorInfo();
+			throw new Exception("Errno: $error[0], Errstr: $error[2]");
+		}
+	}
+	
 	/*
 		例子：
 		table_count('forum');
