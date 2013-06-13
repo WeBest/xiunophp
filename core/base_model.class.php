@@ -475,7 +475,7 @@ class base_model {
 			$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 		}
 		
-		$n = $lowprority ? $n : $m;
+		$n = $lowprority ? $m : $n;
 		return $n;
 	}
 	
@@ -510,7 +510,7 @@ class base_model {
 			$this->unique = array();
 			$m = $this->db->index_delete($this->table, $cond, $lowprority);
 		}
-		$n = $lowprority ? $n : $m;
+		$n = $lowprority ? $m : $n;
 		if($n > 0) {
 			$this->count('-'.$n);
 		}
