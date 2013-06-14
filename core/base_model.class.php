@@ -450,19 +450,17 @@ class base_model {
 	
 	// 2.4 新增接口，按照条件更新，不鼓励使用
 	public function index_update($cond, $update, $lowprority = FALSE) {
-		// 清空当前model的缓存
-		// 影响的行数
-		$n = $lowprority ? $this->index_count($cond) : 0;
+		$n = $this->index_count($cond);
 		$m = 0;
 		if(!empty($this->conf['cache']['enable'])) {
-			if($n == 0) return 0;
-			// 清空缓存
 			if($n > 2000) {
+				// 清空缓存
 				$this->unique = array();
 				$this->cache->flush();
 				$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
-			// 一条一条的删除
+			
 			} else {
+				// 一条一条的删除缓存
 				$keys = $this->index_fetch_id($cond);
 				foreach($keys as $key) {
 					unset($this->unique[$key]);
@@ -474,35 +472,30 @@ class base_model {
 			$this->unique = array();
 			$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 		}
-		
-		$n = $lowprority ? $m : $n;
+		$n = max($n, $m);
 		return $n;
 	}
 	
 	// 2.4 新增接口，按照条件删除，不鼓励使用
 	public function index_delete($cond, $lowprority = FALSE) {
-		// 清空当前model的缓存
-		
 		// 影响的行数
-		$n = $lowprority ? $this->index_count($cond) : 0;
+		$n = $this->index_count($cond);
 		$m = 0;
+		if($n == 0) return 0;
 		if(!empty($this->conf['cache']['enable'])) {
 			// 判断影响的行数，如果超过2000行，则清空缓存，否则一条一条的删除
-			if($n == 0) return 0;
-			// 清空缓存
 			if($n > 2000) {
+				// 清空缓存
 				$this->unique = array();
 				$this->cache->flush();
 				$m = $this->db->index_delete($this->table, $cond, $lowprority);
-			// 一条一条的删除
+		
 			} else {
+				// 一条一条的删除
 				$keys = $this->index_fetch_id($cond);
 				foreach($keys as $key) {
 					unset($this->unique[$key]);
 					$this->db_cache_delete($key);
-				}
-				if(!empty($this->maxcol)) {
-					$this->count('-'.$n);
 				}
 				$m = $this->db->index_delete($this->table, $cond, $lowprority);
 			}
@@ -510,8 +503,8 @@ class base_model {
 			$this->unique = array();
 			$m = $this->db->index_delete($this->table, $cond, $lowprority);
 		}
-		$n = $lowprority ? $m : $n;
-		if($n > 0) {
+		$n = max($n, $m); // 大并发插入下，这个值可能不准，$m != $n，需要定期手工校对。
+		if($n > 0 && !empty($this->maxcol)) {
 			$this->count('-'.$n);
 		}
 		return $n;
