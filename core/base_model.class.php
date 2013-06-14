@@ -472,7 +472,7 @@ class base_model {
 			$this->unique = array();
 			$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 		}
-		$n = max($n, $m);
+		$n = $m ? $m : $n; // 大并发插入下，这个值可能不准，$m != $n，需要定期手工校对。
 		return $n;
 	}
 	
@@ -503,7 +503,7 @@ class base_model {
 			$this->unique = array();
 			$m = $this->db->index_delete($this->table, $cond, $lowprority);
 		}
-		$n = max($n, $m); // 大并发插入下，这个值可能不准，$m != $n，需要定期手工校对。
+		$n = $m ? $m : $n; // 大并发插入下，这个值可能不准，$m != $n，需要定期手工校对。
 		if($n > 0 && !empty($this->maxcol)) {
 			$this->count('-'.$n);
 		}
