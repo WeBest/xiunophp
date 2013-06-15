@@ -67,7 +67,7 @@ class utf8 {
 		return $matches[1];
 	}
 	
-	public static function cutstr_cn($s, $len) {
+	public static function cutstr_cn($s, $len, $more = '...') {
 		$n = strlen($s);
 		$r = '';
 		$rlen = 0;
@@ -98,6 +98,9 @@ class utf8 {
 			}
 			if($rlen >= $len) break;
 		}
+		
+		$n > strlen($r) && $r .= $more;
+	
 		return $r;
 	}
 	
