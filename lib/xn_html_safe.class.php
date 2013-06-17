@@ -1592,6 +1592,7 @@ class xn_html_safe {
 			'width'=>array('range', '100%', array(0, 4096)),
 			'height'=>array('range', 'auto', array(0, 80000)),
 			'size'=>array('range', 4, array(-10, 10)),
+			'border'=>array('range', 0, array(0, 10)),
 			'family'=>array('pcre', '', array(self::$pattern['word'])),
 			'face'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
