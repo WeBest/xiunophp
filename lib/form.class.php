@@ -60,6 +60,11 @@ class form {
 		return $s;
 	}
 	
+	public static function get_hidden($name, $value) {
+		$s = "<input type=\"hidden\" name=\"$name\" id=\"$name\" value=\"$value\" />";
+		return $s;
+	}
+	
 	public static function get_textarea($name, $value, $width = 600,  $height = 300) {
 		$s = "<textarea name=\"$name\" id=\"$name\" style=\"width: {$width}px; height: {$height}px;\">$value</textarea>";
 		return $s;
