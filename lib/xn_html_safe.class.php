@@ -1399,6 +1399,33 @@ class HTML_White {
 					$value .= "$k:$v; ";
 				}
 				$value = substr($value, 0, -1);
+				
+			// 过滤危险的 embed src=
+	               /*} elseif($name == 'src') {
+	              	 	$v = $this->white_value[$name];
+	              	 	$ok = 0;
+	              	 	foreach($v[2] as $pcre) {
+					if(preg_match($pcre, $value)) {
+						$ok = 1; break;
+					}
+				}
+				
+				$tag = array_pop($this->_stack);
+				array_push($this->_stack, $tag);
+	               		if($tag == 'embed') {
+	               			//  && strpos($value, '.swf') !== FALSE
+	               			$safearr = array('youku.com', '56.com', 'ku6.com', 'tudou.com', 'joy.cn', 'sina.com.cn', 'ifeng.com', 'qq.com', 'sohu.com', 'iqiyi.com', 'qiyi.com');
+	               			$arr = parse_url($value);
+	               			$hostarr = explode('.', $host);
+	               			if(count($hostarr) > 2) {
+	               				$hostarr = array_slice($hostarr, -2);
+	               			}
+	               			$host = implode('.', $hostarr);
+	               			if(!in_array($host, $safearr)) {
+	               				$value = 'http://cloud.xiuno.net/check-url.htm?url='.urlencode($value);
+	               			}
+	               		}
+	               		$value = $ok ? $value : $v[1];*/
 	                // 白名单值
 	                } elseif(isset($this->white_value[$name]))  {
 	                	$v = $this->white_value[$name];
