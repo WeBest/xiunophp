@@ -210,6 +210,9 @@ class template {
 			$s = preg_replace('#([\'"])\?(.+?\.htm)#i', '\\1'.$this->conf['app_url'].'?\\2', $s);
 		}
 		
+		// 修正美国免费空间异常BUG chr(0xEF).chr(0xBF).chr(0xBD);
+		//$s = str_replace(chr(0xEF).chr(0xBF).chr(0xBD), '', $s);
+		
 		return $s;
 	}
 	
@@ -265,7 +268,8 @@ class template {
 	}
 
 	private function array_keyexists($name, $items) {
-		return "<?php echo isset($name$items) ? $name$items : '';?>";
+		// 此处不能有空格，美国免费空间居然会在中间插入乱码 ED A7 A0 / ED 9E BA /， 如此诡异的空间！最终导致 jquery .html() 出错。
+		return "<?php echo isset($name$items)?$name$items:'';?>";
 	}
 
 	private function stripvtag($s, $instring = FALSE) {
