@@ -162,6 +162,7 @@ class base_model {
 	
 	public function get_cache_instance($key = '') {
 		$conf = $this->get_cache_conf($key);
+		!isset($conf[$conf['type']]) && $conf[$conf['type']] = array('host'=>'', 'port'=>0);
 		$c = $conf[$conf['type']];
 		$id = $conf['type'].'-'.$c['host'].'-'.$c['port'];
 		if(isset(self::$cacheinsts[$id])) {
