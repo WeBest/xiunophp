@@ -594,15 +594,9 @@ class core {
 		$modelname = 'model_'.$model.'.class.php';
 		$modelfile = $conf['tmp_path'].$modelname;
 		if((!is_file($modelfile) || DEBUG > 1) && !IN_SAE) {
-			// 开始从以下路径查找 model： model, upload/plugin/*/
+			// 开始从以下路径查找 model： upload/plugin/*/ , model, 
 			$orgfile = '';
-			foreach($conf['model_path'] as &$path) {
-				if(is_file($path.$model.'.class.php')) {
-					$orgfile = $path.$model.'.class.php';
-					break;
-				}
-			}
-			if(empty($orgfile) && empty($conf['plugin_disable'])) {
+			if(empty($conf['plugin_disable'])) {
 				$plugins = self::get_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as &$v) {
@@ -613,6 +607,14 @@ class core {
 					}
 					if(is_file($path."$model.class.php")) {
 						$orgfile = $path."$model.class.php";
+						break;
+					}
+				}
+			}
+			if(empty($orgfile)) {
+				foreach($conf['model_path'] as &$path) {
+					if(is_file($path.$model.'.class.php')) {
+						$orgfile = $path.$model.'.class.php';
 						break;
 					}
 				}
@@ -665,16 +667,7 @@ class core {
 		// 如果缓存文件不存在，则搜索目录
 		if(!is_file($objfile) || (DEBUG > 0 && !IN_SAE)) {
 			$controlfile = '';
-			$paths = $conf['control_path'];
-			foreach($paths as $path) {
-				$controlfile = $path."{$control}_control.class.php";
-				if(is_file($controlfile)) {
-					break;
-				} else {
-					$controlfile = '';
-				}
-			}
-			if(empty($controlfile) && empty($conf['plugin_disable'])) {
+			if(empty($conf['plugin_disable'])) {
 				$plugins = core::get_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
@@ -686,6 +679,17 @@ class core {
 					}
 					if(is_file($path."{$control}_control.class.php")) {
 						$controlfile =  $path."{$control}_control.class.php";
+						break;
+					} else {
+						$controlfile = '';
+					}
+				}
+			}
+			if(empty($controlfile)) {
+				$paths = $conf['control_path'];
+				foreach($paths as $path) {
+					$controlfile = $path."{$control}_control.class.php";
+					if(is_file($controlfile)) {
 						break;
 					} else {
 						$controlfile = '';
