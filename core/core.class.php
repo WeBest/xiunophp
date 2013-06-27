@@ -395,9 +395,6 @@ class core {
 			$r = str_replace('_htm', '.htm', $r);		
 		}
 		
-		// setcookie 的时候，依赖此设置。在浏览器的头中 HTTP HEADER Cookie: xxx, expiry: xxx
-		// 这里初始值，后面可以设置正确的值。
-		date_default_timezone_set('Asia/Shanghai');
 		
 		$get = &$_GET;
 		$r = substr($r, strrpos($r, '/') + 1);				//第[1]步
@@ -628,10 +625,51 @@ class core {
 		}
 		return $modelfile;
 	}
+	
+	public static function init_timezone($conf = array()) {
+		// 初始化时区
+		// setcookie 的时候，依赖此设置。在浏览器的头中 HTTP HEADER Cookie: xxx, expiry: xxx
+		// 这里初始值，后面可以设置正确的值。
+		if(!empty($conf['timeoffset'])) {
+			$zones = array (
+				'-12' => 'Kwajalein',
+				'-11' => 'Pacific/Midway',
+				'-10' => 'Pacific/Honolulu',
+				'-9' => 'America/Anchorage',
+				'-8' => 'America/Los_Angeles',
+				'-7' => 'America/Denver',
+				'-6' => 'America/Tegucigalpa',
+				'-5' => 'America/New_York',
+				'-4' => 'America/Halifax',
+				'-3' => 'America/Sao_Paulo',
+				'-2' => 'Atlantic/South_Georgia',
+				'-1' => 'Atlantic/Azores',
+				'0' => 'Europe/Dublin',
+				'+1' => 'Europe/Belgrade',
+				'+2' => 'Europe/Minsk',
+				'+3' => 'Asia/Tehran',
+				'+4' => 'Asia/Muscat',
+				'+5' => 'Asia/Katmandu',
+				'+6' => 'Asia/Rangoon',
+				'+7' => 'Asia/Krasnoyarsk',
+				'+8' => 'Asia/Shanghai',
+				'+9' => 'Australia/Darwin',
+				'+10' => 'Australia/Canberra',
+				'+11' => 'Asia/Magadan',
+				'+12' => 'Pacific/Fiji',
+				'+13' => 'Pacific/Tongatapu',
+			);
+			// php 5.4 以后，不再支持 Etc/GMT+8 这种格式！
+			if(isset($zones[$conf['timeoffset']])) {
+				date_default_timezone_set($zones[$conf['timeoffset']]);
+			}
+		}
 		
-	public static function init() {
+	}
+		
+	public static function init($conf = array()) {
 		// ---------------------> 初始化
-		
+		core::init_timezone($conf);
 		core::init_set();
 		core::init_supevar();
 		core::init_handle();

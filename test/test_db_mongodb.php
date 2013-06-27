@@ -12,7 +12,7 @@ define('FRAMEWORK_PATH', TEST_PATH.'../');
 $conf = include TEST_PATH.'conf.php';
 
 include FRAMEWORK_PATH.'core.php';
-core::init();
+core::init($conf);
 
 echo "Test db_mongodb.class.php \r\n\r\n";
 
