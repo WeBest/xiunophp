@@ -13,7 +13,7 @@ define('FRAMEWORK_PATH', TEST_PATH.'../');
 
 $conf = include TEST_PATH.'conf.php';
 include FRAMEWORK_PATH.'core.php';
-core::init();
+core::init($conf);
 
 $cache = new cache_memcache($conf['cache']['memcache']);
 
