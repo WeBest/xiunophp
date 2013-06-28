@@ -84,8 +84,6 @@ class template {
 					if(is_file($path.$filename)) {
 						$file = $path.$filename;
 						break;
-					} else {
-						$file = '';
 					}
 				}
 			}
@@ -227,25 +225,21 @@ class template {
 	private function requiretpl($filename) {
 		// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 		$file = '';
-		foreach($this->conf['view_path'] as $path) {
-			$file = $path.$filename;
-			if(is_file($file)) {
-				break;
-			} else {
-				$file = '';
+		
+		$plugins = core::get_enable_plugins($this->conf);
+		$pluginnames = array_keys($plugins);
+		foreach($pluginnames as $v) {
+			// 如果有相关的 app path, 这只读取该目录
+			$path = $this->conf['plugin_path'].$v.'/';
+			if(is_file($path.$filename)) {
+				$file = $path.$filename;
 			}
 		}
+		
 		if(empty($file)) {
-			$plugins = core::get_enable_plugins($this->conf);
-			$pluginnames = array_keys($plugins);
-			foreach($pluginnames as $v) {
-				// 如果有相关的 app path, 这只读取该目录
-				$path = $this->conf['plugin_path'].$v.'/';
-				$file = $path.$filename;
-				if(is_file($file)) {
-					break;
-				} else {
-					$file = '';
+			foreach($this->conf['view_path'] as $path) {
+				if(is_file($path.$filename)) {
+					$file = $path.$filename;
 				}
 			}
 		}
