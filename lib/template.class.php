@@ -233,6 +233,7 @@ class template {
 			$path = $this->conf['plugin_path'].$v.'/';
 			if(is_file($path.$filename)) {
 				$file = $path.$filename;
+				break;
 			}
 		}
 		
@@ -240,6 +241,7 @@ class template {
 			foreach($this->conf['view_path'] as $path) {
 				if(is_file($path.$filename)) {
 					$file = $path.$filename;
+					break;
 				}
 			}
 		}
