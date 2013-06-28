@@ -72,7 +72,7 @@ class template {
 			// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 			$file = '';
 			if(empty($this->conf['plugin_disable'])) {
-				$plugins = core::get_plugins($this->conf);
+				$plugins = core::get_enable_plugins($this->conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
 					$path = $this->conf['plugin_path'].$v.'/';
@@ -236,7 +236,7 @@ class template {
 			}
 		}
 		if(empty($file)) {
-			$plugins = core::get_plugins($this->conf);
+			$plugins = core::get_enable_plugins($this->conf);
 			$pluginnames = array_keys($plugins);
 			foreach($pluginnames as $v) {
 				// 如果有相关的 app path, 这只读取该目录

@@ -397,6 +397,9 @@ class core {
 		
 		
 		$get = &$_GET;
+		$query_string = core::gpc('QUERY_STRING', 'S'); // URL-REWRITE 后，此处为REWRITE后的值。
+		parse_str($query_string, $get);
+		
 		$r = substr($r, strrpos($r, '/') + 1);				//第[1]步
 		strtolower(substr($r, 0, 9)) == 'index.php' && $r = substr($r, 9);
 		substr($r, 0, 1) == '?' && $r = substr($r, 1);
@@ -444,12 +447,12 @@ class core {
 	public static function process_hook(&$conf, $hookfile) {
 		$s = '';
 		// 遍历插件目录，如果有该 hook
-		$plugins = core::get_plugins($conf);
+		$plugins = core::get_enable_plugins($conf);
 		$pluginnames = array_keys($plugins);
 		foreach($pluginnames as $v) {
 			$path = $conf['plugin_path'].$v;
 			if(!is_file($path.'/'.$hookfile)) continue;
-			if(empty($plugins[$v]) || empty($plugins[$v]['enable'])) continue;
+			if(empty($plugins[$v])) continue; // 特殊情况
 			
 			$s2 = file_get_contents($path.'/'.$hookfile);
 			
@@ -528,6 +531,20 @@ class core {
 		
 		return $plugins;
 	}
+	
+	public static function get_enable_plugins(&$conf, $force = 0) {
+		$plugins = core::get_plugins($conf, $force);
+		
+		static $enable_plugins = array();
+		if(!empty($enable_plugins) && !$force) return $enable_plugins;
+		
+		foreach($plugins as $k=>$plugin) {
+			if(!empty($plugin['installed']) && !empty($plugin['enable'])) {
+				$enable_plugins[$k] = $plugin;
+			}
+		}
+		return $enable_plugins;
+	}
 
 	public static function get_paths($path, $fullpath = FALSE) {
 		$arr = array();
@@ -594,7 +611,7 @@ class core {
 			// 开始从以下路径查找 model： upload/plugin/*/ , model, 
 			$orgfile = '';
 			if(empty($conf['plugin_disable'])) {
-				$plugins = self::get_plugins($conf);
+				$plugins = self::get_enable_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as &$v) {
 					$path = $conf['plugin_path'].$v.'/';
@@ -706,7 +723,7 @@ class core {
 		if(!is_file($objfile) || (DEBUG > 0 && !IN_SAE)) {
 			$controlfile = '';
 			if(empty($conf['plugin_disable'])) {
-				$plugins = core::get_plugins($conf);
+				$plugins = core::get_enable_plugins($conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
 					// 如果有相关的 app path, 这只读取该目录, plugin/xxx/abc_control.class.php, plugin/xxx/admin/abc_control.class.php
