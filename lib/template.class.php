@@ -71,7 +71,15 @@ class template {
 			
 			// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 			$file = '';
-			if(empty($this->conf['plugin_disable'])) {
+			if(!empty($this->conf['first_view_path'])) {
+				foreach($this->conf['first_view_path'] as $path) {
+					if(is_file($path.$filename)) {
+						$file = $path.$filename;
+						break;
+					}
+				}
+			}
+			if(empty($file) && empty($this->conf['plugin_disable'])) {
 				$plugins = core::get_enable_plugins($this->conf);
 				$pluginnames = array_keys($plugins);
 				foreach($pluginnames as $v) {
