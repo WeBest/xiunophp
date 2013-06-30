@@ -233,18 +233,26 @@ class template {
 	private function requiretpl($filename) {
 		// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 		$file = '';
-		
-		$plugins = core::get_enable_plugins($this->conf);
-		$pluginnames = array_keys($plugins);
-		foreach($pluginnames as $v) {
-			// 如果有相关的 app path, 这只读取该目录
-			$path = $this->conf['plugin_path'].$v.'/';
-			if(is_file($path.$filename)) {
-				$file = $path.$filename;
-				break;
+		if(!empty($this->conf['first_view_path'])) {
+			foreach($this->conf['first_view_path'] as $path) {
+				if(is_file($path.$filename)) {
+					$file = $path.$filename;
+					break;
+				}
 			}
 		}
-		
+		if(empty($file)) {
+			$plugins = core::get_enable_plugins($this->conf);
+			$pluginnames = array_keys($plugins);
+			foreach($pluginnames as $v) {
+				// 如果有相关的 app path, 这只读取该目录
+				$path = $this->conf['plugin_path'].$v.'/';
+				if(is_file($path.$filename)) {
+					$file = $path.$filename;
+					break;
+				}
+			}
+		}
 		if(empty($file)) {
 			foreach($this->conf['view_path'] as $path) {
 				if(is_file($path.$filename)) {
