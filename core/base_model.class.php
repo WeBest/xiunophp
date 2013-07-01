@@ -413,7 +413,7 @@ class base_model {
 		return $this->db_cache_delete($key);
 	}
 	
-	// 清空数据表，缓存不清空
+	// 清空数据
 	public function truncate() {
 		return $this->db_cache_truncate();
 	}
