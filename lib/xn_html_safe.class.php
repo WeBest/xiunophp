@@ -1623,6 +1623,7 @@ class xn_html_safe {
 			'family'=>array('pcre', '', array(self::$pattern['word'])),
 			'face'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
+			'alt'=>array('pcre', '', array(self::$pattern['safe'])),
 			'target'=>array('list', '_self', array('_blank', '_self')),
 			'class'=>array('pcre', '', array('#^((code|quote)|(brush:\w+;?\s*(tab\-size:\d+)?))$#is')),
 			'type'=>array('pcre', '', array('#^[\w/\-]+$#')),

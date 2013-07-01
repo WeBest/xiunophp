@@ -457,7 +457,7 @@ class base_model {
 			if($n > 2000) {
 				// 清空缓存
 				$this->unique = array();
-				$this->cache->flush();
+				$this->cache->truncate($this->table);
 				$m = $this->db->index_update($this->table, $cond, $update, $lowprority);
 			
 			} else {
@@ -488,7 +488,7 @@ class base_model {
 			if($n > 2000) {
 				// 清空缓存
 				$this->unique = array();
-				$this->cache->flush();
+				$this->cache->truncate($this->table);
 				$m = $this->db->index_delete($this->table, $cond, $lowprority);
 		
 			} else {
