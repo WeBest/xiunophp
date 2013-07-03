@@ -1458,8 +1458,8 @@ class HTML_White {
 				$value = $name;
 	                }
 	                
-			$tempval = preg_replace('/&#(\d+);?/me', "chr('\\1')", $value); //"'
-			$tempval = preg_replace('/&#x([0-9a-f]+);?/mei', "chr(hexdec('\\1'))", $tempval);
+			$tempval = preg_replace_callback('/&#(\d+);?/m', array($this, 'chr_callback'), $value); //"'
+			$tempval = preg_replace_callback('/&#x([0-9a-f]+);?/mi', array($this, 'chr_hexdec_callback'), $tempval);
 
 			$value = str_replace("\"", "&quot;", $value);
 			if($value == '' && $name == 'style') {  
@@ -1468,6 +1468,16 @@ class HTML_White {
 				$this->_xhtml .= ' ' . $name . '="' . $value . '"';
 			}
 		}
+        }
+        
+        private function chr_callback($matchs) {
+        	$s = $matchs[1];
+        	return chr($s);
+        }
+        
+        private function chr_hexdec_callback($matchs) {
+        	$s = $matchs[1];
+        	return chr(hexdec($s));
         }
         
 	public function _openHandler(&$parser, $name, $attrs) {

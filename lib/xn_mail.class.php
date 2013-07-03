@@ -1906,16 +1906,16 @@ class PHPMailer {
 
     switch (strtolower($position)) {
       case 'phrase':
-        $encoded = preg_replace("/([^A-Za-z0-9!*+\/ -])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+        $encoded = preg_replace_callback("/([^A-Za-z0-9!*+\/ -])/", array($this, 'sprintf_1_callback'), $encoded);
         break;
       case 'comment':
-        $encoded = preg_replace("/([\(\)\"])/e", "'='.sprintf('%02X', ord('\\1'))", $encoded);
+        $encoded = preg_replace_callback("/([\(\)\"])/", array($this, 'sprintf_1_callback'), $encoded);
       case 'text':
       default:
         // Replace every high ascii, control =, ? and _ characters
         //TODO using /e (equivalent to eval()) is probably not a good idea
-        $encoded = preg_replace('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/e',
-                                "'='.sprintf('%02X', ord(stripslashes('\\1')))", $encoded);
+        $encoded = preg_replace_callback('/([\000-\011\013\014\016-\037\075\077\137\177-\377])/',
+                               array($this, 'sprintf_2_callback'), $encoded);
         break;
     }
 
@@ -1923,6 +1923,14 @@ class PHPMailer {
     $encoded = str_replace(' ', '_', $encoded);
 
     return $encoded;
+  }
+  
+  private function sprintf_1_callback($matchs) {
+  	return '='.sprintf('%02X', ord($matchs[1]));
+  }
+  
+  private function sprintf_2_callback($matchs) {
+  	return '='.sprintf('%02X', ord(stripslashes($matchs[1])));
   }
 
   /**
