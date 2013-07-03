@@ -471,6 +471,11 @@ class core {
 		return $s;
 	}
 	
+	public static function process_hook_callback($matchs) {
+		$s = $matchs[1];
+		return self::process_hook($_SERVER['preg_replace_callback_arg'], $s);
+	}
+	
 	public static function process_urlrewrite(&$conf, &$s) {
 		if($conf['urlrewrite']) {
 			$s = preg_replace('#([\'"])\?(.+?\.htm)#i', '\\1'.$conf['app_url'].'\\2', $s);
@@ -481,6 +486,7 @@ class core {
 	
 	// 对于包含的目标文件进行处理，生成 bbs_common_control.class.php 
 	// 约定 include BBS_PATH.'xxx/xxx.php'; 这样的格式。避免 eval() 解析。
+	public $fix_conf; // 用来保存 $conf，用于 preg_replace_callback 传参，PHP 低版本缺陷。
 	public static function process_include(&$conf, &$s) {
 		preg_match_all('#[\r\n]{1,2}\s*include\s+(\w+)\.[\'"]([^;]+)[\'"];#is', $s, $m);
 		if(!empty($m[1])) {
@@ -490,7 +496,10 @@ class core {
 				$tmpfile = $conf['tmp_path'].$file;
 				$tmptmpfile = FRAMEWORK_TMP_TMP_PATH.$file;
 				$s2 = file_get_contents($realpath);
-				$s2 = preg_replace('#\t*\/\/\s*hook\s+([^\s]+)#ies', "core::process_hook(\$conf, '\\1')", $s2);
+				// 需要 php5.3 以后才支持匿名函数: function($matchs) use ($conf) {}
+				// 这里不得不用逆天的全局变量来解决这个问题
+				$_SERVER['preg_replace_callback_arg'] = $conf;
+				$s2 = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s2);
 				core::process_urlrewrite($conf, $s2);
 				file_put_contents($tmptmpfile, $s2);
 				$s = str_replace($m[0][$k], "\r\n\tinclude '$tmpfile';", $s);
@@ -637,7 +646,8 @@ class core {
 				return FALSE;
 			}
 			$s = file_get_contents($orgfile);
-			$s = preg_replace('#\t*\/\/\s*hook\s+([^\s]+)#ies', "core::process_hook(\$conf, '\\1')", $s);
+			$_SERVER['preg_replace_callback_arg'] = $conf;
+			$s = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s);
 			file_put_contents($modelfile, $s);
 		}
 		return $modelfile;
@@ -761,7 +771,9 @@ class core {
 			}
 			$s = file_get_contents($controlfile);
 			core::process_include($conf, $s);
-			$s = preg_replace('#\t*\/\/\s*hook\s+([^\s]+)#ies', "core::process_hook(\$conf, '\\1')", $s);
+			$_SERVER['preg_replace_callback_arg'] = $conf;
+			$s = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s);
+
 			core::process_urlrewrite($conf, $s);
 			file_put_contents($objfile, $s);
 		}

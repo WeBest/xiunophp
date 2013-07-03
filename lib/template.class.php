@@ -140,11 +140,11 @@ class template {
 			} else {
 				$s = preg_replace("/<!--\{(.+?)\}-->/s", "{\\1}", $s);
 				$s = preg_replace('#\{include\s+([^}]*?)\}#is', "{require \\1}", $s);
-				$s = preg_replace('#\{require\s+([^}]*?)\}#ies', "\$this->requiretpl('\\1')", $s);
+				$s = preg_replace_callback('#\{require\s+([^}]*?)\}#is', array($this, 'requiretpl'), $s); // php5.2 支持 array(), php 5.3 支持 self::requiretpl
 			}
 			$s = preg_replace("/<!--\{(.+?)\}-->/s", "{\\1}", $s);
-			$s = preg_replace('#\{hook\s+([^}]+)\}#ies', "\$this->process_hook(\$conf, '\\1')", $s);
-			$s = preg_replace('#\t*//\s*hook\s+([^\s]+)#ies', "\$this->process_hook(\$conf, '\\1')", $s);
+			$s = preg_replace_callback('#\{hook\s+([^}]+)\}#is', array($this, 'process_hook'), $s);
+			$s = preg_replace_callback('#\t*//\s*hook\s+([^\s]+)#is', array($this, 'process_hook'), $s);// (\$conf, '\\1')"
 		}
 		
 		// 美化 button, 自动转换 <input class="button" ... /> 为 <a><span></span></a>
@@ -161,8 +161,7 @@ class template {
 		$s = preg_replace("/\{($this->const_regexp)\}/", "<?=\\1?>", $s);
 		
 		// 修正 $data[key] -> $data['key']
-		$s = preg_replace("/\<\?=(\@?\\\$[a-zA-Z_]\w*)((\[[^\]]+\])+)\?\>/ies", "\$this->arrayindex('\\1', '\\2')", $s);
-		//$s = preg_replace("/\<\?=(\@?\\\$[a-zA-Z_]\w*)((\[\w+\])+)\?\>/ies", "\$this->arrayindex('\\1', '\\2')", $s);
+		$s = preg_replace_callback("/\<\?=(\@?\\\$[a-zA-Z_]\w*)((\[[^\]]+\])+)\?\>/is", array($this, 'arrayindex'), $s);
 
 		/*$s = preg_replace("/(?<!\<\?\=|\\\\)$this->var_regexp/", "<?=\\0?>", $s);*/
 		
@@ -174,16 +173,16 @@ class template {
 		$s = preg_replace('#\{include\s+([^}]*?)\}#is', "<?php include \$this->gettpl('\\1');?>", $s);
 		
 		$isset = '<\?php echo isset(?:+*?) ? (?:+*?) : ;\?>';
-		$s = preg_replace("/\{\{php (.*?)\}\}/ies", "\$this->stripvtag('<? \\1?>')", $s);
-		$s = preg_replace("/\{php (.*?)\}/ies", "\$this->stripvtag('<? \\1?>')", $s);
-		$s = preg_replace("/\{for (.*?)\}/ies", "\$this->stripvtag('<? for(\\1) {?>')", $s);
+		$s = preg_replace_callback("/\{\{php (.*?)\}\}/is", array($this, 'stripvtag_callback'), $s);
+		$s = preg_replace_callback("/\{php (.*?)\}/is", array($this, 'stripvtag_callback'), $s);
+		$s = preg_replace_callback("/\{for (.*?)\}/is", array($this, 'stripvtag_callback'), $s); //  "\$this->stripvtag('<? for(\\1) {
 		
-		$s = preg_replace("/\{elseif\s+(.+?)\}/ies", "\$this->stripvtag('<? } elseif(\\1) { ?>')", $s);
+		$s = preg_replace_callback("/\{elseif\s+(.+?)\}/is", array($this, 'stripvtag_callback'), $s);
 		for($i=0; $i<4; $i++) {
-			$s = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "\$this->loopsection('\\1', '\\2', '\\3', '\\4')", $s);
-			$s = preg_replace("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/ies", "\$this->loopsection('\\1', '', '\\2', '\\3')", $s);
+			$s = preg_replace_callback("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/is", array($this, 'loopsection'), $s);
+			$s = preg_replace_callback("/\{loop\s+$this->vtag_regexp\s+$this->vtag_regexp\}(.+?)\{\/loop\}/is", array($this, 'loopsection'), $s);
 		}
-		$s = preg_replace("/\{if\s+(.+?)\}/ies", "\$this->stripvtag('<? if(\\1) { ?>')", $s);
+		$s = preg_replace_callback("/\{if\s+(.+?)\}/is", array($this, 'stripvtag_callback'), $s);
 		
 		$s = preg_replace("/\{else\}/is", "<? } else { ?>", $s);
 		$s = preg_replace("/\{\/if\}/is", "<? } ?>", $s);
@@ -192,7 +191,7 @@ class template {
 		$s = preg_replace("/$this->const_regexp/", "<?=\\1?>", $s);//{else} 也符合常量格式，此处要注意先后顺??
 		
 		// 给数组KEY加上判断
-		$s = preg_replace("/\<\?=\@(\\\$[a-zA-Z_]\w*)((\[[\\$\[\]\w\']+\])+)\?\>/ies", "\$this->array_keyexists('\\1', '\\2')", $s);
+		$s = preg_replace_callback("/\<\?=\@(\\\$[a-zA-Z_]\w*)((\[[\\$\[\]\w\']+\])+)\?\>/is", array($this, 'array_keyexists'), $s);
 		$s = "<? !defined('FRAMEWORK_PATH') && exit('Access Denied');?>$s";
 
 		// 翻译段标签为全标签
@@ -230,7 +229,8 @@ class template {
 		return $s;
 	}*/
 	
-	private function requiretpl($filename) {
+	public function requiretpl($matchs) {
+		$filename = $matchs[1]; 
 		// 模板目录搜索顺序：view_xxx/, view/, plugin/*/
 		$file = '';
 		if(!empty($this->conf['first_view_path'])) {
@@ -267,12 +267,15 @@ class template {
 		return file_get_contents($file);
 	}
 	
-	private function process_hook(&$conf, $hookfile) {
-		$s = core::process_hook($conf, $hookfile);
+	private function process_hook($matchs) {
+		$hookfile = $matchs[1];
+		$s = core::process_hook($this->conf, $hookfile);
 		return $s;
 	}
 
-	private function arrayindex($name, $items) {
+	private function arrayindex($matchs) {
+		$name = $matchs[1];
+		$items = $matchs[2];
 		if(strpos($items, '$') === FALSE) {
 			$items = preg_replace("/\[([\$a-zA-Z_][\w\$]*)\]/is", "['\\1']", $items);
 		} else {
@@ -284,6 +287,22 @@ class template {
 	private function array_keyexists($name, $items) {
 		// 此处不能有空格，美国免费空间居然会在中间插入乱码 ED A7 A0 / ED 9E BA /， 如此诡异的空间！最终导致 jquery .html() 出错。
 		return "<?php echo isset($name$items)?$name$items:'';?>";
+	}
+	
+	private function stripvtag_callback($matchs) {
+		$arr = explode(' ', $matchs[0]);
+		$pre = $arr[0];
+		$s = $matchs[1];
+		if($pre == '{for') {
+			$s = '<? for('.$s.') {?>';
+		} elseif($pre == '{php') {
+			$s = '<? '.$s.'?>';
+		} elseif($pre == '{elseif') {
+			$s = '<? } elseif('.$s.') { ?>';
+		} elseif($pre == '{if') {
+			$s = '<? if('.$s.') { ?>';
+		}
+		return $this->stripvtag($s);
 	}
 
 	private function stripvtag($s, $instring = FALSE) {
@@ -305,7 +324,19 @@ class template {
 		return $arr;
 	}
 
-	private function loopsection($arr, $k, $v, $statement) {
+	private function loopsection($matchs) {
+		if(isset($matchs[4])) {
+			$arr = $matchs[1];
+			$k = $matchs[2];
+			$v = $matchs[3];
+			$statement = $matchs[4];
+		} else {
+			$arr = $matchs[1];
+			$k = '';
+			$v = $matchs[2];
+			$statement = $matchs[3];
+		}
+		
 		$arr = $this->stripvtag($arr);
 		$k = $this->stripvtag($k);
 		$v = $this->stripvtag($v);
