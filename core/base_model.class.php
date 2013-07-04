@@ -347,8 +347,8 @@ class base_model {
 			} else {
 				$key = $this->get_key($arr);
 				// 查询是否已经存在，防止覆盖
-				$arr = $this->db_cache_get($key);
-				if(!empty($arr)) {
+				$arr2 = $this->db_cache_get($key);
+				if(!empty($arr2)) {
 					return FALSE;
 				}
 			}
@@ -414,6 +414,7 @@ class base_model {
 		unset($this->unique[$key]);
 		
 		if(!empty($this->maxcol)) {
+			// 如果 key 存在，则 -1， 防止误操作。
 			if($this->db_cache_get($key)) {
 				$this->count('-1');
 			}
