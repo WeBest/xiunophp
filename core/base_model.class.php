@@ -347,13 +347,13 @@ class base_model {
 			} else {
 				$key = $this->get_key($arr);
 				// 查询是否已经存在，防止覆盖
-				$arr = $this->get($key);
+				$arr = $this->db_cache_get($key);
 				if(!empty($arr)) {
 					return FALSE;
 				}
 			}
 			$this->count('+1');
-			if($this->set($key, $arr)) {
+			if($this->db_cache_set($key, $arr)) {
 				return $arr[$this->maxcol];
 			} else {
 				$this->maxid('-1');
@@ -363,7 +363,7 @@ class base_model {
 		} else {
 			// 如果没有设置 maxcol, 则执行处理 count(), maxid()
 			$key = $this->get_key($arr);
-			$this->set($key, $arr);
+			$this->db_cache_set($key, $arr);
 			return TRUE;
 		}
 	}
@@ -410,11 +410,14 @@ class base_model {
 		$arg3 !== FALSE && array_push($key, $arg3);
 		$arg4 !== FALSE && array_push($key, $arg4);
 		
-		if(!empty($this->maxcol)) {
-			$this->count('-1');
-		}
 		$key = $this->to_key($key);
 		unset($this->unique[$key]);
+		
+		if(!empty($this->maxcol)) {
+			if($this->db_cache_get($key)) {
+				$this->count('-1');
+			}
+		}
 		return $this->db_cache_delete($key);
 	}
 	
