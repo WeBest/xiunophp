@@ -539,6 +539,10 @@ class base_model {
 	}
 	
 	// 从 arr 中提取 key string
+	/*
+		array('uid'=>123, 'username'=>'abc', 'email'=>'xx@xx.com')
+		'user-uid-123'
+	*/
 	public function get_key($arr) {
 		$s = $this->table;
 		foreach($this->primarykey as $v) {
@@ -548,6 +552,10 @@ class base_model {
 	}
 	
 	// 数组 to key
+	/*
+		array(1, 2)
+		'thread-fid-1-tid-2'
+	*/
 	public function to_key($key) {
 		$s = $this->table;
 		foreach((array)$key as $k=>$v) {
