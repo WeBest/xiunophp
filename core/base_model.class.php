@@ -347,7 +347,6 @@ class base_model {
 			$this->count('+1');
 			$key = $this->get_key($arr);
 			if($this->set($key, $arr)) {
-				$this->unique[$key] = $arr;
 				return $arr[$this->maxcol];
 			} else {
 				$this->maxid('-1');
@@ -358,7 +357,6 @@ class base_model {
 			// 如果没有设置 maxcol, 则执行处理 count(), maxid()
 			$key = $this->get_key($arr);
 			$this->set($key, $arr);
-			$this->unique[$key] = $arr;
 			return TRUE;
 		}
 	}
