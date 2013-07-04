@@ -341,10 +341,11 @@ class base_model {
 	*/
 	public function create($arr) {
 		if(!empty($this->maxcol)) {
-			$key = $this->get_key($arr);
 			if(!isset($arr[$this->maxcol])) {
 				$arr[$this->maxcol] = $this->maxid('+1');	// 自增
+				$key = $this->get_key($arr);
 			} else {
+				$key = $this->get_key($arr);
 				// 查询是否已经存在，防止覆盖
 				$arr = $this->get($key);
 				if(!empty($arr)) {
