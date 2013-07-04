@@ -23,7 +23,7 @@ class base_control {
 		// 用法：$this->db->query("SHOW STATUS");
 		} elseif($var == 'db') {
 			$conf = $this->conf;
-			$type = $conf['type'];
+			$type = $conf['db']['type'];
 			$dbname = "db_$type";
 			return new $dbname($conf['db'][$type]);
 			
