@@ -119,36 +119,36 @@ class core {
 		return !isset($_SERVER['REMOTE_ADDR']);
 	}
 	
-        public static function ob_handle($s) {
-        	if(!empty($_SERVER['ob_stack'])) {
+	public static function ob_handle($s) {
+		if(!empty($_SERVER['ob_stack'])) {
 			$gzipon = array_pop($_SERVER['ob_stack']);
 		} else {
 			// throw new Exception('');
 			$gzipon = 0;	
 		}
 		$isfirst = count($_SERVER['ob_stack']) == 0;
-        	if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
+		if($gzipon && !ini_get('zlib.output_compression') && function_exists('gzencode') && strpos(core::gpc('HTTP_ACCEPT_ENCODING', 'S'), 'gzip') !== FALSE) {
 			$s = gzencode($s, 5);   		// 0 - 9 级别, 9 最小，最耗费 CPU 
 			$isfirst && header("Content-Encoding: gzip");
 			//$isfirst && header("Vary: Accept-Encoding");	// 下载的时候，IE 6 会直接输出脚本名，而不是文件名！非常诡异！估计是压缩标志混乱。
 			$isfirst && header("Content-Length: ".strlen($s));
-        	} else {
-        		// PHP 强制发送的 gzip 头
-        		if(ini_get('zlib.output_compression')) {
-        			$isfirst && header("Content-Encoding: gzip");
-        		} else {
-        			$isfirst && header("Content-Encoding: none");
-               			$isfirst && header("Content-Length: ".strlen($s));
-        		}
-        	}
-        	return $s;
-        }
+		} else {
+			// PHP 强制发送的 gzip 头
+			if(ini_get('zlib.output_compression')) {
+				$isfirst && header("Content-Encoding: gzip");
+			} else {
+				$isfirst && header("Content-Encoding: none");
+	       			$isfirst && header("Content-Length: ".strlen($s));
+			}
+		}
+		return $s;
+	}
 
-        public static function ob_start($gzip = TRUE) {
-        	!isset($_SERVER['ob_stack']) && $_SERVER['ob_stack'] = array();
-        	array_push($_SERVER['ob_stack'], $gzip);
-        	ob_start(array('core', 'ob_handle'));
-        }
+	public static function ob_start($gzip = TRUE) {
+		!isset($_SERVER['ob_stack']) && $_SERVER['ob_stack'] = array();
+		array_push($_SERVER['ob_stack'], $gzip);
+		ob_start(array('core', 'ob_handle'));
+	}
 	
 	public static function ob_end_clean() {
 		!empty($_SERVER['ob_stack']) && count($_SERVER['ob_stack']) > 0 && ob_end_clean();
@@ -274,18 +274,18 @@ class core {
 		
 		// 防止死循环
 		$errortype = array (
-			E_ERROR              => 'Error',
-			E_WARNING            => 'Warning',
-			E_PARSE              => 'Parsing Error',	# uncatchable
-			E_NOTICE             => 'Notice',
-			E_CORE_ERROR         => 'Core Error',		# uncatchable
+			E_ERROR	      => 'Error',
+			E_WARNING	    => 'Warning',
+			E_PARSE	      => 'Parsing Error',	# uncatchable
+			E_NOTICE	     => 'Notice',
+			E_CORE_ERROR	 => 'Core Error',		# uncatchable
 			E_CORE_WARNING       => 'Core Warning',		# uncatchable
 			E_COMPILE_ERROR      => 'Compile Error',	# uncatchable
 			E_COMPILE_WARNING    => 'Compile Warning',	# uncatchable
-			E_USER_ERROR         => 'User Error',
+			E_USER_ERROR	 => 'User Error',
 			E_USER_WARNING       => 'User Warning',
-			E_USER_NOTICE        => 'User Notice',
-			E_STRICT             => 'Runtime Notice',
+			E_USER_NOTICE	=> 'User Notice',
+			E_STRICT	     => 'Runtime Notice',
 			//E_RECOVERABLE_ERRROR => 'Catchable Fatal Error'
 		);
 		
