@@ -178,7 +178,7 @@ class image {
 	 * @param int $imgcomp 		被裁区域的高度
 	image::clip_img('XXX/X.JPG', 'XXX/NEWX.JPG', 10, 40, 150, 150)
 	 */
-	public static function clip ($sourcefile, $destfile, $clipx, $clipy, $clipwidth, $clipheight) {
+	public static function clip($sourcefile, $destfile, $clipx, $clipy, $clipwidth, $clipheight) {
 		$getimgsize = getimagesize($sourcefile);
 		if(empty($getimgsize)) {
 			return 0;
@@ -219,6 +219,48 @@ class image {
 		unlink($tmpfile);
 		return $n;
 	}
+	
+	// 先裁切后缩略，因为确定了，width, height, 不需要返回宽高。
+	public static function clip_thumb($sourcefile, $destfile, $forcedwidth = 80, $forcedheight = 80) {
+		// 获取原图片宽高
+		$getimgsize = getimagesize($sourcefile);
+		if(empty($getimgsize)) {
+			return 0;
+		} else {
+			$src_width = $getimgsize[0];
+			$src_height = $getimgsize[1];
+			if($src_width == 0 || $src_height == 0) {
+				return 0;
+			}
+		}
+		
+		$src_scale = $src_width / $src_height;
+		$des_scale = $forcedwidth / $forcedheight;
+		
+		if($src_width <= $forcedwidth && $src_height <= $forcedheight) {
+			$des_width = $src_width;
+			$des_height = $src_height;
+			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
+			return filesize($destfile);
+		} elseif($src_scale >= $des_scale) {
+			// 以原图的高度作为标准，进行缩略
+			$des_height = $src_height;
+			$des_width = $src_height * $des_scale;
+			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
+			if($n <=0) return 0;
+			$r = image::thumb($destfile, $destfile, $forcedwidth, $forcedheight);
+			return $r['filesize'];
+		} else {
+			// 以原图的宽度作为标准，进行缩略
+			$des_width = $src_width;
+			$des_height = $src_width * $des_scale;
+			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
+			if($n <=0) return 0;
+			$r = image::thumb($destfile, $destfile, $forcedwidth, $forcedheight);
+			return $r['filesize'];
+		}
+	}
 }
 //image::thumb('D:/image/IMG_0433.JPG', 'd:/image/xxx.gif');
+//echo image::clip_thumb('d:/image/editor_bg.gif', 'd:/image/editor_bg_2.gif', 200, 200);
 ?>
