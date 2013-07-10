@@ -3,7 +3,7 @@
 /**
  * @name XiunoPHP Redis驱动类
  *
- * @author Andy Lee
+ * @author Andy Lee，由 twcms 作者空城做修正
  *
  * @copyright lostman.org
  *
@@ -13,11 +13,14 @@
 if (!defined('FRAMEWORK_PATH')) {
 	exit('FRAMEWORK_PATH not defined.');
 }
+
 class cache_redis implements cache_interface {
 	public $conf;
+
 	public function __construct($conf) {
 		$this->conf = $conf;
 	}
+
 	public function __get($var) {
 		if ($var == 'redis') {
 			if (extension_loaded('Redis')) {
@@ -35,37 +38,45 @@ class cache_redis implements cache_interface {
 			}
 		}
 	}
+
 	public function get($key) {
 		$data = array();
 		if (is_array($key)) {
 			foreach ($key as $k) {
-				$arr = $this->redis->get($k);
-				$arr && $data[$k] = $arr;
+				$arr = $this->redis->hgetall($k);
+				$data[$k] = $arr;
 			}
-			$data = json_encode($data);
-			return json_decode($data);
+			return $data;
 		} else {
-			$data = $this->redis->get($key);
-			return json_decode($data);
+			return $this->redis->hgetall($key);
 		}
 	}
+
 	public function set($key, $val, $life = 0) {
-		$val = json_encode($val);
-		if ($life == 0) {
-			return $this->redis->set($key, $val);
-		} else {
-			return $this->redis->setex($key, $life, $val);
+		$ret = $this->redis->hmset($key, $val);
+		if($life && $ret) {
+			$this->redis->expire($key, $life);
 		}
+		return $ret;
 	}
+
 	public function update($key, $val) {
-		return $this->redis->set($key, $val);
+		$arr = $this->get($key);
+		if($arr !== FALSE) {
+			is_array($arr) && is_array($val) && $arr = array_merge($arr, $val);
+			return $this->set($key, $arr);
+		}
+		return FALSE;
 	}
+
 	public function delete($key) {
-		return $this->redis->del($key);
+		return $this->redis->hdel($key);
 	}
+
 	public function truncate($pre = '') {
 		return $this->redis->flushdb();
 	}
+
 	public function maxid($table, $val = FALSE) {
 		$key = $table . '-Auto_increment';
 		if ($val === FALSE) {
@@ -80,6 +91,7 @@ class cache_redis implements cache_interface {
 			return $val;
 		}
 	}
+
 	public function count($table, $val = FALSE) {
 		$key = $table . '-Rows';
 		if ($val === FALSE) {
