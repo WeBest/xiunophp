@@ -1,7 +1,13 @@
 <?php
 
 /*
- * Copyright (C) xiuno.com
+ * XiunoPHP v1.2
+ * http://www.xiuno.com/
+ *
+ * Copyright 2010 (c) axiuno@gmail.com
+ * GNU LESSER GENERAL PUBLIC LICENSE Version 3
+ * http://www.gnu.org/licenses/lgpl.html
+ *
  */
 
 class image {

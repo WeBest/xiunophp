@@ -1,7 +1,13 @@
 <?php
 
 /*
- * Copyright (C) xiuno.com
+ * XiunoPHP v1.2
+ * http://www.xiuno.com/
+ *
+ * Copyright 2010 (c) axiuno@gmail.com
+ * GNU LESSER GENERAL PUBLIC LICENSE Version 3
+ * http://www.gnu.org/licenses/lgpl.html
+ *
  */
 
 // 静态类，提供各种全局方法
@@ -376,7 +382,7 @@ class core {
 		    [page] => 2
 		)
 		
-	   测试: http://www.domain.com/xn/framework2.0/?a-b.htm?c=d&e=http%3A%2F%2F1111.sss.com%2Ff.htm
+	   测试: http://www.domain.com/xn/?a-b.htm?c=d&e=http%3A%2F%2F1111.sss.com%2Ff.htm
 	   结果：
 	   	Array
 		(

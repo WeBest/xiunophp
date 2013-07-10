@@ -1,13 +1,19 @@
 <?php
 
+/*
+ * XiunoPHP v1.2
+ * http://www.xiuno.com/
+ *
+ * Copyright 2010 (c) axiuno@gmail.com
+ * GNU LESSER GENERAL PUBLIC LICENSE Version 3
+ * http://www.gnu.org/licenses/lgpl.html
+ *
+ */
+
 if(!isset($_SERVER['time'])) {
 	$_SERVER['time'] = time();
 	$_SERVER['time_fmt'] = gmdate('y-n-j H:i', time() + 8 * 3600);
 }
-
-/*
- * Copyright (C) xiuno.com
- */
 
 class log {
 	public static function write($s, $file = 'phperror.php') {
