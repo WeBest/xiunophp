@@ -617,7 +617,7 @@ class core {
 		$modelname = 'model_'.$model.'.class.php';
 		$modelfile = $conf['tmp_path'].$modelname;
 		if((!is_file($modelfile) || DEBUG > 1) && !IN_SAE) {
-			// 开始从以下路径查找 model： upload/plugin/*/ , model, 
+			// 开始从以下路径查找 model： plugin/*/ , model/, 
 			$orgfile = '';
 			if(empty($conf['plugin_disable'])) {
 				$plugins = self::get_enable_plugins($conf);
