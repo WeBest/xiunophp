@@ -171,7 +171,7 @@ class core {
 			// E_ALL | E_STRICT
 			error_reporting(E_ALL | E_STRICT);
 			//error_reporting(E_ALL & ~(E_NOTICE | E_STRICT));
-			@ini_set('display_error', 'ON');
+			@ini_set('display_errors', 'ON');
 			
 		} else {
 			error_reporting(E_ALL & ~E_NOTICE);
