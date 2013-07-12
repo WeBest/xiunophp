@@ -1626,7 +1626,7 @@ class xn_html_safe {
 		$white_value = array(
 			'href'=>array('pcre', '', array(self::$pattern['url'], self::$pattern['ed2k_url'])),
 			'src'=>array('pcre', '', array(self::$pattern['img_url'])),
-			'width'=>array('range', '100%', array(0, 4096)),
+			'width'=>array('range', '', array(0, 4096)),
 			'height'=>array('range', 'auto', array(0, 80000)),
 			'size'=>array('range', 4, array(-10, 10)),
 			'border'=>array('range', 0, array(0, 10)),
