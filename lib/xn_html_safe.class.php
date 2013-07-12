@@ -1621,7 +1621,7 @@ class xn_html_safe {
 			'table', 'tr', 'td', 'th', 'tbody', 'thead', 'tfoot','caption',
 			'ol', 'ul', 'li', 'dl', 'dt', 'dd', 'menu', 'multicol',
 			'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'hr', 'p', 'div', 'pre',
-			'br', 'img', 'area',  'embed',
+			'br', 'img', 'area',  'embed', 'code'
 		);
 		$white_value = array(
 			'href'=>array('pcre', '', array(self::$pattern['url'], self::$pattern['ed2k_url'])),
