@@ -1612,7 +1612,7 @@ class xn_html_safe {
 		'ftp_url'=>'#^ftp:([\w%\-\.]+)@([\w%\-\.]+)(\.[\w%\-\.]+?)+$#is',
 		'ed2k_url'=>'#^(?:ed2k|thunder|qvod|magnet)://[^\s\'\"\\\\<>]+$#is',
 		'color'=>'#^(\#\w{3,6})|(rgb\(\d+,\s*\d+,\s*\d+\)|(\w{3,10}))$#is',
-		'safe'=>'#^[\w\-\.\s]+$#is',
+		'safe'=>'#^[\w\-\.\s\x7f-\xff]+$#is',
 		'word'=>'#^[\w\-\x7f-\xff]+$#is',
 	);
 	
@@ -1634,6 +1634,7 @@ class xn_html_safe {
 			'face'=>array('pcre', '', array(self::$pattern['word'])),
 			'color'=>array('pcre', '', array(self::$pattern['color'])),
 			'alt'=>array('pcre', '', array(self::$pattern['safe'])),
+			'title'=>array('pcre', '', array(self::$pattern['safe'])),
 			'target'=>array('list', '_self', array('_blank', '_self')),
 			'class'=>array('pcre', '', array('#^((code|quote)|(brush:\w+;?\s*(tab\-size:\d+)?))$#is')),
 			'type'=>array('pcre', '', array('#^[\w/\-]+$#')),
