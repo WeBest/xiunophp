@@ -191,7 +191,7 @@ class db_mysql implements db_interface {
 				return $val;
 			}
 		} else {
-			$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+			$this->query("REPLACE INTO {$this->tablepre}framework_count SET count='$val', name='$key'", $this->xlink);
 			return $val;
 		}
 	}
