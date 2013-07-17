@@ -185,7 +185,12 @@ class db_mongodb implements db_interface {
 	
 	public function truncate($table) {
 		// 清除该表的统计数据
-		return $this->wdb->selectCollection($table)->drop();
+		try {
+			$this->wdb->selectCollection($table)->drop();
+			return TRUE;
+		} catch (Exception $e) {
+			return FALSE;
+		}
 	}
 	
 	public function index_fetch_id($table, $keyname, $cond = array(), $orderby = array(), $start = 0, $limit = 0) {

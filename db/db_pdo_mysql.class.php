@@ -186,7 +186,12 @@ class db_pdo_mysql implements db_interface {
 	
 	public function truncate($table) {
 		$table = $this->tablepre.$table;
-		return $this->query("TRUNCATE $table");
+		try {
+			$this->query("TRUNCATE $table");
+			return TRUE;
+		} catch (Exception $e) {
+			return FALSE;
+		}
 	}
 
 	public function index_fetch($table, $keyname, $cond = array(), $orderby = array(), $start = 0, $limit = 0) {
