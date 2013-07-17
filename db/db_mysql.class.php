@@ -355,7 +355,7 @@ class db_mysql implements db_interface {
 	}
 	
 	public function connect($host, $user, $password, $name, $charset = '', $engine = '') {
-		$link = mysql_connect($host, $user, $password);
+		$link = mysql_connect($host, $user, $password, TRUE);
 		if(!$link) {
 			throw new Exception(self::br(mysql_error()));
 		}
