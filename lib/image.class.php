@@ -198,8 +198,7 @@ class image {
 		
 		if(!function_exists('imagecreatefromjpeg')) {
 			copy($sourcefile, $destfile);
-			$return = array('filesize'=>filesize($destfile), 'width'=>$src_width, 'height'=>$src_height);
-			return $return;
+			return filesize($destfile);
 		}
 		switch($getimgsize[2]) {
 			case 1 :
