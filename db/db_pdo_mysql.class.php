@@ -386,7 +386,11 @@ class db_pdo_mysql implements db_interface {
 		$count = 0;
 		try {
 			$arr = $this->fetch_first("SELECT count FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
-			$count = intval($arr['count']);
+			if($arr === FALSE) {
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
+			} else {
+				$count = intval($arr['count']);
+			}
 		} catch (Exception $e) {
 			$this->query("CREATE TABLE {$this->tablepre}framework_count (
 				`name` char(32) NOT NULL default '',
