@@ -492,7 +492,6 @@ class core {
 	
 	// 对于包含的目标文件进行处理，生成 bbs_common_control.class.php 
 	// 约定 include BBS_PATH.'xxx/xxx.php'; 这样的格式。避免 eval() 解析。
-	public $fix_conf; // 用来保存 $conf，用于 preg_replace_callback 传参，PHP 低版本缺陷。
 	public static function process_include(&$conf, &$s) {
 		preg_match_all('#[\r\n]{1,2}\s*include\s+(\w+)\.[\'"]([^;]+)[\'"];#is', $s, $m);
 		if(!empty($m[1])) {
@@ -503,7 +502,7 @@ class core {
 				$tmptmpfile = FRAMEWORK_TMP_TMP_PATH.$file;
 				$s2 = file_get_contents($realpath);
 				// 需要 php5.3 以后才支持匿名函数: function($matchs) use ($conf) {}
-				// 这里不得不用逆天的全局变量来解决这个问题
+				// 这里不得不用全局变量来解决这个问题
 				$_SERVER['preg_replace_callback_arg'] = $conf;
 				$s2 = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s2);
 				core::process_urlrewrite($conf, $s2);

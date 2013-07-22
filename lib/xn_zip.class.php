@@ -372,24 +372,35 @@ class php_zip {
 		return true;
 	}
 	
+	// 参考 wordpress 和 http://bbs.xiuno.com/thread-index-fid-27-tid-3483.htm
 	private function compatible_gzinflate($gzData) {
 		
+		// gzencode 函数
 		if ( substr($gzData, 0, 3) == "\x1f\x8b\x08" ) {
-			$i = 10;
-			$flg = ord( substr($gzData, 3, 1) );
-			if ( $flg > 0 ) {
-				if ( $flg & 4 ) {
-					list($xlen) = unpack('v', substr($gzData, $i, 2) );
-					$i = $i + 2 + $xlen;
+			if(function_exists('gzdecode')) {
+				return gzdecode($gzData);
+			} else {
+				$i = 10;
+				$flg = ord( substr($gzData, 3, 1) );
+				if ( $flg > 0 ) {
+					if ( $flg & 4 ) {
+						list($xlen) = unpack('v', substr($gzData, $i, 2) );
+						$i = $i + 2 + $xlen;
+					}
+					if ( $flg & 8 )
+						$i = strpos($gzData, "\0", $i) + 1;
+					if ( $flg & 16 )
+						$i = strpos($gzData, "\0", $i) + 1;
+					if ( $flg & 2 )
+						$i = $i + 2;
 				}
-				if ( $flg & 8 )
-					$i = strpos($gzData, "\0", $i) + 1;
-				if ( $flg & 16 )
-					$i = strpos($gzData, "\0", $i) + 1;
-				if ( $flg & 2 )
-					$i = $i + 2;
+				if(function_exists('gzinflate')) {
+					return gzinflate(substr($gzData, $i, -8));
+				} else {
+					throw new Exception('gzinflate() has been disabled');
+					//return gzuncompress($gzData);
+				}
 			}
-			return gzinflate( substr($gzData, $i, -8) );
 		} else {
 			return FALSE;
 		}
