@@ -71,7 +71,7 @@ class base_model {
 
 	// 当前应用的配置
 	public $conf = array();			// 配置文件，包含各种选项，实际是全局的 $conf
-	public $arg_conf = array();		// 用来保存从参数传递过来的配置参数。
+	public $old_conf = array();		// 用来保存从参数传递过来的配置参数。
 
 	// 如果需要自动加载model，必须指定这三项！
 	public $table;				// 用来标示 table
