@@ -17,49 +17,25 @@ if(!defined('FRAMEWORK_PATH')) {
 class db_pdo_sqlite implements db_interface {
 
 	private $conf;
-	//private $wlink;	// 读写分离
-	//private $rlink;	// 读写分离
-	//private $xlink;	// 单点服务器
+	//private $link;	// 不支持主从，一个连接足够。
 	public $tablepre;	// 方便外部读取
 	
 	public function __construct($conf) {
 		$this->conf = $conf;
-		$this->tablepre = $this->conf['master']['tablepre'];
+		$this->tablepre = $this->conf['tablepre'];
 	}
 		
 	public function __get($var) {
 		$conf = $this->conf;
-		if($var == 'rlink') {
-			// 如果没有指定从数据库，则使用 master
-			if(empty($this->conf['slaves'])) {
-				$this->rlink = $this->wlink;
-				return $this->rlink;
-			}
-			$n = rand(0, count($this->conf['slaves']) - 1);
-			$conf = $this->conf['slaves'][$n];
-			$this->rlink = $this->connect($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['charset']);
-			return $this->rlink;
-		} elseif($var == 'wlink') {
-			$conf = $this->conf['master'];
-			$this->wlink = $this->connect($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['charset'], $conf['engine']);
-			return $this->wlink;
-		} elseif($var == 'xlink') {
-			// 如果没有指定从数据库，则使用 master
-			if(empty($this->conf['arbiter'])) {
-				$this->xlink = $this->wlink;
-				return $this->xlink;
-			}
-			
-			$conf = $this->conf['arbiter'];
-			empty($conf['engine']) && $conf['engine'] = '';
-			$this->xlink = $this->connect($conf['host'], $conf['user'], $conf['password'], $conf['name'], $conf['charset'], $conf['engine']);
-			
-			return $this->xlink;
+		if($var == 'link') {
+			$conf = $this->conf;
+			$this->link = $this->connect($conf['host']);
+			return $this->link;
 		}
 	}
 	
 	// 仅安装时使用，接口中并未定义
-	public function connect($host, $user, $password, $name, $charset = '', $engine = '') {//为满足sqlite特性 $host修改为 "BBS_PATH/xxx"
+	public function connect($host) {//为满足sqlite特性 $host修改为 "BBS_PATH/xxx"
 		$sqlitedb = "sqlite:$host";
 		try {
 			$link = new PDO($sqlitedb);//连接sqlite
@@ -91,7 +67,7 @@ class db_pdo_sqlite implements db_interface {
 			if($sqladd) {
 				$sql = "SELECT * FROM $tablename WHERE $sqladd";
 				defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-				$result = $this->rlink->query($sql);
+				$result = $this->link->query($sql);
 				$result->setFetchMode(PDO::FETCH_ASSOC);
 				$datalist = $result->fetchAll();
 				foreach($datalist as $data) {
@@ -148,10 +124,10 @@ class db_pdo_sqlite implements db_interface {
 			return $maxid;
 		} elseif(is_string($val) && $val{0} == '+') {
 			$val = intval($val);
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table'", $this->link);
 			return $maxid += $val;
 		} else {
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->link);
 			// ALTER TABLE Auto_increment 这个不需要改，REPLACE INTO 直接覆盖
 			return $val;
 		}
@@ -164,15 +140,15 @@ class db_pdo_sqlite implements db_interface {
 		} elseif(is_string($val)) {
 			if($val{0} == '+') {
 				$val = $count + abs(intval($val));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->link);
 				return $val;
 			} else {
 				$val = max(0, $count - abs(intval($val)));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->link);
 				return $val;
 			}
 		} else {
-			$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->link);
 			return $val;
 		}
 	}
@@ -210,7 +186,7 @@ class db_pdo_sqlite implements db_interface {
 		$s .= ($limit ? " LIMIT $start, $limit" : '');
 		$sql = $s;
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		$result = $this->rlink->query($sql);
+		$result = $this->link->query($sql);
 		if(!$result) {
 			return array();
 		}
@@ -255,7 +231,7 @@ class db_pdo_sqlite implements db_interface {
 		$set = $this->arr_to_sqladd($update);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		return $this->exec("UPDATE $sqladd $table SET $set[sqldata] $where", $this->wlink);
+		return $this->exec("UPDATE $sqladd $table SET $set[sqldata] $where", $this->link);
 	}
 	
 	// 根据条件删除，不鼓励使用。
@@ -264,26 +240,26 @@ class db_pdo_sqlite implements db_interface {
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
 		//print_r("DELETE $lowprority FROM $table $where");exit;
-		return $this->exec("DELETE $lowprority FROM $table $where", $this->wlink);
+		return $this->exec("DELETE $lowprority FROM $table $where", $this->link);
 	}
 	
 	public function index_create($table, $index) {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)", $this->wlink);
+		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)", $this->link);
 	}
 	
 	public function index_drop($table, $index) {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->wlink);
+		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->link);
 	}
 	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {
-		empty($link) && $link = $this->wlink;
+		empty($link) && $link = $this->link;
 		$type = strtolower(substr($sql, 0, 4));
 		if($type == 'sele' || $type == 'show') {
 			$result = $link->query($sql);
@@ -300,7 +276,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	// 返回行数
 	public function exec($sql) {
-		$n = $this->wlink->exec($sql);
+		$n = $this->link->exec($sql);
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
 		return $n;
 	}
@@ -345,7 +321,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	public function fetch_first($sql, $link = NULL) {
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		empty($link) && $link = $this->rlink;
+		empty($link) && $link = $this->link;
 		$result = $link->query($sql);
 		if($result) {
 			$result->setFetchMode(PDO::FETCH_ASSOC);
@@ -358,7 +334,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	public function fetch_all($sql, $link = NULL) {
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		empty($link) && $link = $this->rlink;
+		empty($link) && $link = $this->link;
 		$result = $link->query($sql);
 		if($result) {
 			$result->setFetchMode(PDO::FETCH_ASSOC);
@@ -384,9 +360,9 @@ class db_pdo_sqlite implements db_interface {
 	private function table_count($key) {
 		$count = 0;
 		try {
-			$arr = $this->fetch_first("SELECT count FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
+			$arr = $this->fetch_first("SELECT count FROM {$this->tablepre}framework_count WHERE name='$key'", $this->link);
 			if($arr === FALSE) {
-				$this->query("INSERT INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 0)", $this->xlink);
+				$this->query("INSERT INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 0)", $this->link);
 			} else {
 				$count = intval($arr['count']);
 			}
@@ -395,8 +371,8 @@ class db_pdo_sqlite implements db_interface {
 				`name` char(32) NOT NULL default '',
 				`count` int(11) NOT NULL default '0',
 				PRIMARY KEY (`name`)
-				)", $this->xlink);
-			$this->query("REPLACE INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 1)", $this->xlink);
+				)", $this->link);
+			$this->query("REPLACE INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 1)", $this->link);
 		}
 		return $count;
 	}
@@ -409,14 +385,10 @@ class db_pdo_sqlite implements db_interface {
 	private function table_maxid($key) {
 		list($table, $col) = explode('-', $key);
 		$maxid = 0;
-		
 		try {
-			
-			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
-			//print_r("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'");exit;
-			//var_dump($arr);exit;
+			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->link);
 			if($arr === FALSE) {
-				$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '0')", $this->xlink);
+				$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '0')", $this->link);
 			} else {
 				$maxid = intval($arr['maxid']);
 			}
@@ -426,10 +398,10 @@ class db_pdo_sqlite implements db_interface {
 				name char(32) NOT NULL default '',
 				maxid int(11) NOT NULL default '0',
 				PRIMARY KEY (`name`)
-				)", $this->xlink);
-			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
+				)", $this->link);
+			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
 			$maxid = $arr['maxid'];
-			$this->query("REPLACE INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->xlink);
+			$this->query("REPLACE INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 		}
 		return $maxid;
 	}
@@ -467,11 +439,11 @@ class db_pdo_sqlite implements db_interface {
 	}
 	
 	public function __destruct() {
-		if(isset($this->wlink)) {
-			$this->wlink = NULL;
+		if(isset($this->link)) {
+			$this->link = NULL;
 		}
-		if(isset($this->rlink) && $this->rlink != $this->wlink) {
-			$this->rlink = NULL;
+		if(isset($this->link) && $this->link != $this->link) {
+			$this->link = NULL;
 		}
 	}
 	
