@@ -28,7 +28,7 @@ return array (
 			'slaves' => array (
 			)
 		),
-		'pdo' => array (
+		'pdo_mysql' => array (
 			'master' => array (
 					'host' => 'localhost',
 					'user' => 'root',
@@ -37,6 +37,19 @@ return array (
 					'charset' => 'utf8',
 					'tablepre' => 'bbs_',
 					'engine'=>'MyISAM',
+			),
+			'slaves' => array (
+			)
+		),
+		'pdo_sqlite' => array (
+			'master' => array (
+				'host' => 'sqlitetest.db',
+				'user' => '',
+				'password' => '',
+				'name' => '',
+				'charset' => 'utf8',
+				'tablepre' => 'bbs_',
+				'engine'=>'',
 			),
 			'slaves' => array (
 			)

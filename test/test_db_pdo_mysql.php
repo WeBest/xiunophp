@@ -15,11 +15,7 @@ $conf = include TEST_PATH.'conf.php';
 include FRAMEWORK_PATH.'core.php';
 core::init($conf);
 
-$db = new db_pdo($conf['db']['pdo']);
-
-$db->truncate('user');
-$db->maxid('user-uid', 0);
-$db->count('user', 0);
+$db = new db_pdo($conf['db']['pdo_mysql']);
 
 $db->query("DROP TABLE IF EXISTS `bbs_user`");
 
@@ -38,6 +34,10 @@ $db->query("CREATE TABLE `bbs_user` (
   KEY username(`username`),
   PRIMARY KEY (`uid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;");
+
+$db->truncate('user');
+$db->maxid('user-uid', 0);
+$db->count('user', 0);
 
 // 增加一条记录:
 $uid = $db->maxid('user-uid', '+1');
