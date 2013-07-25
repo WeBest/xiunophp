@@ -182,7 +182,7 @@ class image {
 	 * @param int $destfile 	被裁切图片的Y坐标
 	 * @param int $destext 		被裁区域的宽度
 	 * @param int $imgcomp 		被裁区域的高度
-	image::clip_img('XXX/X.JPG', 'XXX/NEWX.JPG', 10, 40, 150, 150)
+	image::clip('xxx/x.jpg', 'xxx/newx.jpg', 10, 40, 150, 150)
 	 */
 	public static function clip($sourcefile, $destfile, $clipx, $clipy, $clipwidth, $clipheight) {
 		$getimgsize = getimagesize($sourcefile);

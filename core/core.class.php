@@ -312,7 +312,7 @@ class core {
 				//$s = preg_replace('#[\\x80-\\xff]{2}#', '?', $s);// 替换掉 gbk， 否则 json_encode 会报错！
 				// 判断错误级别，决定是否退出。
 				
-				if($errno != E_NOTICE) {
+				if($errno != E_NOTICE && $errno != E_USER_ERROR && $errno != E_USER_NOTICE && $errno != E_USER_WARNING) {
 					$s = self::json_encode(array('servererror'=>$s));
 					throw new Exception($s);
 					exit;
