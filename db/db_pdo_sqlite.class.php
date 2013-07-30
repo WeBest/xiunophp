@@ -281,6 +281,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {
+		echo $sql."\r\n\r\n";
 		empty($link) && $link = $this->link;
 		$type = strtolower(substr($sql, 0, 4));
 		if($type == 'sele' || $type == 'show') {
@@ -309,11 +310,11 @@ class db_pdo_sqlite implements db_interface {
 			$s = ' WHERE ';
 			foreach($cond as $k=>$v) {
 				if(!is_array($v)) {
-					$v = addslashes($v);
+					$v = $this->addslashes($v);
 					$s .= "$k = '$v' AND ";
 				} else {
 					foreach($v as $k1=>$v1) {
-						$v1 = addslashes($v1);
+						$v1 = $this->addslashes($v1);
 						$k1 == 'LIKE' && ($k1 = ' LIKE ') && $v1 = "%$v1%";
 						$s .= "$k$k1'$v1' AND ";
 					}
@@ -330,7 +331,7 @@ class db_pdo_sqlite implements db_interface {
 		$sqlvalue = '';
 		$sqldata = '';
 		foreach($arr as $k=>$v) {
-			$v = addslashes($v);
+			$v = $this->addslashes($v);
 			$sqlkey .= (empty($sqlkey) ? '' : ',')."$k";
 			$sqlvalue .= (empty($sqlvalue) ? '' : ',')."'$v'";
 			$sqldata .= (empty($sqldata) ? '' : ',')."$k='$v'";
@@ -443,7 +444,7 @@ class db_pdo_sqlite implements db_interface {
 		$keyarr = array();
 		for($i = 1; $i < $len; $i = $i + 2) {
 			if(isset($arr[$i + 1])) {
-				$sqladd .= ($sqladd ? ' AND ' : '').$arr[$i]."='".addslashes($arr[$i + 1])."'";
+				$sqladd .= ($sqladd ? ' AND ' : '').$arr[$i]."='".$this->addslashes($arr[$i + 1])."'";
 				$t = $arr[$i + 1];// mongodb 识别数字和字符串
 				$keyarr[$arr[$i]] = is_numeric($t) ? intval($t) : $t;
 			} else {
@@ -471,6 +472,11 @@ class db_pdo_sqlite implements db_interface {
 	
 	public function version() {
 		return '';// select version()
+	}
+	
+	private function addslashes($s) {
+		$s = str_replace('\'', '\\\'', $s);
+		return $s;
 	}
 	
 }
