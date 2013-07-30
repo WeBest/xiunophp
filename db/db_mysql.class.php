@@ -326,6 +326,28 @@ class db_mysql implements db_interface {
 		$keyname = implode('', array_keys($index));
 		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->wlink);
 	}
+	
+	// 创建表
+	public function table_create($table, $cols, $engineer = 'MyISAM') {
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->tablepre}$table (\n";
+		$sep = '';
+		foreach($cols as $col) {
+			if(strpos($col[1], 'int') !== FALSE) {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT '0'";
+			} else {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT ''";
+			}
+			$sep = ",\n";
+		}
+		$sql .= ") ENGINE=$engineer DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;";
+		return $this->query($sql, $this->wlink);
+	}
+	
+	// DROP table
+	public function table_drop($table) {
+		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		return $this->query($sql, $this->wlink);
+	}
 
 	// -------------> 公共方法，非公开接口
 	public function fetch_first($sql, $link = NULL) {
@@ -507,6 +529,10 @@ class db_mysql implements db_interface {
 		return array($table, $keyarr, $sqladd);
 	}
 	
+	public function version() {
+		return mysql_get_server_info($this->rlink);
+	}
+	
 	// 最好能保证它能最后析构!
 	public function __destruct() {
 		if(!empty($this->wlink)) {
@@ -517,9 +543,6 @@ class db_mysql implements db_interface {
 		}
 	}
 	
-	public function version() {
-		return mysql_get_server_info($this->rlink);
-	}
 
 }
 ?>

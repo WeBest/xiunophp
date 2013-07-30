@@ -90,6 +90,10 @@ interface db_interface {
 	
 	public function index_drop($table, $index);
 	
+	public function table_create($table, $cols, $engineer = '');
+	
+	public function table_drop($table);
+	
 }
 
 /*

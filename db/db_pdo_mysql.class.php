@@ -290,6 +290,28 @@ class db_pdo_mysql implements db_interface {
 		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->wlink);
 	}
 	
+	// 创建表
+	public function table_create($table, $cols, $engineer = 'MyISAM') {
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->tablepre}$table (\n";
+		$sep = '';
+		foreach($cols as $col) {
+			if(strpos($col[1], 'int') !== FALSE) {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT '0'";
+			} else {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT ''";
+			}
+			$sep = ",\n";
+		}
+		$sql .= ") ENGINE=$engineer DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci;";
+		return $this->query($sql, $this->wlink);
+	}
+	
+	// DROP table
+	public function table_drop($table) {
+		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		return $this->query($sql, $this->wlink);
+	}
+	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {
 		empty($link) && $link = $this->wlink;

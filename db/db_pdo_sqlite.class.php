@@ -85,7 +85,6 @@ class db_pdo_sqlite implements db_interface {
 	// insert -> replace
 	public function set($key, $data) {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
-		print_r($this->parse_key($key));
 		$tablename = $this->tablepre.$table;
 		if(is_array($data)) {
 			// 覆盖主键的值
@@ -256,6 +255,30 @@ class db_pdo_sqlite implements db_interface {
 		$keyname = implode('', array_keys($index));
 		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->link);
 	}
+	
+	// 创建表
+	public function table_create($table, $cols, $engineer = '') {
+		$sql = "CREATE TABLE IF NOT EXISTS {$this->tablepre}$table (\n";
+		$sep = '';
+		foreach($cols as $col) {
+			if(strpos($col[1], 'int') !== FALSE) {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT '0'";
+			} else {
+				$sql .= "$sep$col[0] $col[1] NOT NULL DEFAULT ''";
+			}
+			$sep = ",\n";
+		}
+		$sql .= ")";
+		return $this->query($sql, $this->wlink);
+	}
+
+	// DROP table
+	public function table_drop($table) {
+		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		return $this->query($sql, $this->wlink);
+	}
+	
+	// -----------------> 非接口方法
 	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {

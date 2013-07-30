@@ -301,6 +301,17 @@ class db_mongodb implements db_interface {
 		return $cond;
 	}
 	
+
+	// 创建表
+	public function table_create($table, $cols, $engineer = '') {
+		return TRUE;
+	}
+	
+	// DROP table
+	public function table_drop($table) {
+		return TRUE;
+	}
+	
 	// -------------> 私有方法
 	private function connect($host, $user, $password, $name) {
 		$useradd = empty($user) ? '' : "$user:$password@";
