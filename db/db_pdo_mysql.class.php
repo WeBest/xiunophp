@@ -291,7 +291,8 @@ class db_pdo_mysql implements db_interface {
 	}
 	
 	// 创建表
-	public function table_create($table, $cols, $engineer = 'MyISAM') {
+	public function table_create($table, $cols, $engineer = '') {
+		empty($engineer) && $engineer = 'MyISAM';
 		$sql = "CREATE TABLE IF NOT EXISTS {$this->tablepre}$table (\n";
 		$sep = '';
 		foreach($cols as $col) {

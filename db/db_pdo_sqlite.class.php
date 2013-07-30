@@ -21,7 +21,7 @@ class db_pdo_sqlite implements db_interface {
 	public $tablepre;	// 方便外部读取
 	
 	public function __construct($conf) {
-		$this->conf = $conf;
+		$this->conf = $conf['master'];
 		$this->tablepre = $this->conf['tablepre'];
 	}
 		
@@ -154,9 +154,9 @@ class db_pdo_sqlite implements db_interface {
 	
 	public function truncate($table) {//sqlite清空方法,为保持清楚数据时主索引只归0,修改sqlite系统表下面的sqlite_sequence (seq)值；(系统表不可见
 		$table = $this->tablepre.$table;
-		$this->query("UPDATE sqlite_sequence SET seq = 0 WHERE name = '$table'");
-		return $this->query("DELETE FROM $table");
-		
+		try {
+			$this->query("DELETE FROM $table");
+		} catch (Exception $e) {}
 	}
 
 	public function index_fetch($table, $keyname, $cond = array(), $orderby = array(), $start = 0, $limit = 0) {
@@ -238,7 +238,6 @@ class db_pdo_sqlite implements db_interface {
 		$where = $this->cond_to_sqladd($cond);
 		$table = $this->tablepre.$table;
 		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
-		//print_r("DELETE $lowprority FROM $table $where");exit;
 		return $this->exec("DELETE $lowprority FROM $table $where", $this->link);
 	}
 	
@@ -246,14 +245,14 @@ class db_pdo_sqlite implements db_interface {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table ADD INDEX $keyname($keys)", $this->link);
+		return $this->query("CREATE INDEX {$table}_$keyname ON $table($keys)", $this->link);
 	}
 	
 	public function index_drop($table, $index) {
 		$table = $this->tablepre.$table;
 		$keys = implode(', ', array_keys($index));
 		$keyname = implode('', array_keys($index));
-		return $this->query("ALTER TABLE $table DROP INDEX $keyname", $this->link);
+		return $this->query("DROP INDEX {$table}_$keyname", $this->link);
 	}
 	
 	// 创建表
