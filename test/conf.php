@@ -14,7 +14,7 @@ return array (
 	
 	// 数据库配置， type 为默认的数据库类型，可以支持多种数据库: mysql|pdo|mongodb
 	'db' => array (
-		'type' => 'mysql',
+		'type' => 'pdo_mysql',
 		'mysql' => array (
 			'master' => array (
 					'host' => 'localhost',

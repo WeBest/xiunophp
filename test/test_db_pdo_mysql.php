@@ -7,7 +7,7 @@ function bbs_assert($comment, $expression) {
 
 echo "Test db_pdo.class.php \r\n\r\n";
 
-define('DEBUG', 1);
+define('DEBUG', 2);
 define('TEST_PATH', str_replace('\\', '/', getcwd()).'/');
 define('FRAMEWORK_PATH', TEST_PATH.'../');
 
@@ -15,7 +15,7 @@ $conf = include TEST_PATH.'conf.php';
 include FRAMEWORK_PATH.'core.php';
 core::init($conf);
 
-$db = new db_pdo($conf['db']['pdo_mysql']);
+$db = new db_pdo_mysql($conf['db']['pdo_mysql']);
 
 $db->query("DROP TABLE IF EXISTS `bbs_user`");
 
@@ -44,6 +44,8 @@ $uid = $db->maxid('user-uid', '+1');
 bbs_assert("maxid('user', '+1')", $uid == 1);
 $r = $db->set("user-uid-$uid", array('username'=>'admin1', 'email'=>'xxx1@xxx.com'));
 bbs_assert("set()", $r == TRUE);
+
+
 
 // 增加一条记录:
 $uid = $db->maxid('user-uid', '+1');
@@ -92,3 +94,4 @@ $user = $db->get('user-uid-1');
 $user2 = $db->get('user-uid-2');
 bbs_assert("index_delete()", $user['uid'] == 1);
 bbs_assert("index_delete()", empty($user));
+print_r($_SERVER['sqls']);

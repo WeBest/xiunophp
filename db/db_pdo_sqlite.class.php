@@ -66,7 +66,6 @@ class db_pdo_sqlite implements db_interface {
 			$sqladd = substr($sqladd, 0, -4);
 			if($sqladd) {
 				$sql = "SELECT * FROM $tablename WHERE $sqladd";
-				defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
 				$result = $this->query($sql);
 				$result->setFetchMode(PDO::FETCH_ASSOC);
 				$datalist = $result->fetchAll();
@@ -90,7 +89,13 @@ class db_pdo_sqlite implements db_interface {
 			// 覆盖主键的值
 			$data += $keyarr;
 			$s = $this->arr_to_sqladd($data);
-			return $this->query("REPLACE INTO $tablename($s[key]) VALUES ($s[values])");
+			// 判断是否存在，如果存在，则更新
+			$exists = $this->get($key);
+			if(empty($exists)) {
+				return $this->query("INSERT INTO $tablename($s[key]) VALUES ($s[values])");
+			} else {
+				return $this->update($key, $data);
+			}
 		} else {
 			return FALSE;
 		}
@@ -184,8 +189,8 @@ class db_pdo_sqlite implements db_interface {
 		}
 		$s .= ($limit ? " LIMIT $start, $limit" : '');
 		$sql = $s;
-		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
 		$result = $this->query($sql);
+		
 		if(!$result) {
 			return array();
 		}
@@ -281,6 +286,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {
+		log::trace($sql);
 		empty($link) && $link = $this->link;
 		$type = strtolower(substr($sql, 0, 4));
 		if($type == 'sele' || $type == 'show') {
@@ -342,9 +348,7 @@ class db_pdo_sqlite implements db_interface {
 	}
 	
 	public function fetch_first($sql, $link = NULL) {
-		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		empty($link) && $link = $this->link;
-		$result = $link->query($sql);
+		$result = $this->query($sql);
 		if($result) {
 			$result->setFetchMode(PDO::FETCH_ASSOC);
 			return $result->fetch();
@@ -355,9 +359,7 @@ class db_pdo_sqlite implements db_interface {
 	}
 	
 	public function fetch_all($sql, $link = NULL) {
-		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		empty($link) && $link = $this->link;
-		$result = $link->query($sql);
+		$result = $this->query($sql);
 		if($result) {
 			$result->setFetchMode(PDO::FETCH_ASSOC);
 			$return = array();
@@ -389,12 +391,17 @@ class db_pdo_sqlite implements db_interface {
 				$count = intval($arr['count']);
 			}
 		} catch (Exception $e) {
-			$this->query("CREATE TABLE {$this->tablepre}framework_count (
-				`name` char(32) NOT NULL default '',
-				`count` int(11) NOT NULL default '0',
-				PRIMARY KEY (`name`)
-				)", $this->link);
-			$this->query("REPLACE INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 1)", $this->link);
+			if(strpos($e->getMessage(), 'no such table') !== FALSE) {
+				$this->query("CREATE TABLE {$this->tablepre}framework_count (
+					`name` char(32) NOT NULL default '',
+					`count` int(11) NOT NULL default '0',
+					PRIMARY KEY (`name`)
+					)", $this->link);
+				$this->query("INSERT INTO {$this->tablepre}framework_count (name, count) VALUES ('$key', 0)", $this->link);
+			} else {
+				throw new Exception($e->getMessage());
+			}
+			
 		}
 		return $count;
 	}
@@ -423,7 +430,7 @@ class db_pdo_sqlite implements db_interface {
 				)", $this->link);
 			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
 			$maxid = $arr['maxid'];
-			$this->query("REPLACE INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
+			$this->query("INSERT INTO {$this->tablepre}framework_count (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 		}
 		return $maxid;
 	}
@@ -474,8 +481,15 @@ class db_pdo_sqlite implements db_interface {
 	}
 	
 	private function addslashes($s) {
-		//$s = str_replace('\\', '\\\\', $s);
 		$s = str_replace('\'', '\'\'', $s);
+		/*$s = str_replace('/', '//', $s);
+		$s = str_replace('[', '/[', $s);
+		$s = str_replace(']', '/]', $s);
+		$s = str_replace('%', '/%', $s);
+		$s = str_replace('&', '/&', $s);
+		$s = str_replace('_', '/_', $s);
+		$s = str_replace('(', '/(', $s);
+		$s = str_replace(')', '/)', $s);*/
 		return $s;
 	}
 	

@@ -16,7 +16,7 @@ core::init($conf);
 
 echo "Test db_mysql.class.php \r\n\r\n";
 
-$db = new db_mysql($conf['db']['mysql']);
+$db = new db_pdo_mysql($conf['db']['mysql']);
 
 $db->query("DROP TABLE IF EXISTS `bbs_user`");
 

@@ -126,7 +126,13 @@ class db_mysql implements db_interface {
 			// 以值为准。
 			$data += $keyarr;
 			$s = $this->arr_to_sqladd($data);
-			return $this->query("REPLACE INTO $tablename SET $s", $this->wlink);
+			
+			$exists = $this->get($key);
+			if(empty($exists)) {
+				return $this->query("INSERT INTO $tablename SET $s", $this->wlink);
+			} else {
+				return $this->query("UPDATE $tablename SET $s", $this->wlink);
+			}
 		} else {
 			return FALSE;
 		}
@@ -165,7 +171,6 @@ class db_mysql implements db_interface {
 			return $maxid += $val;
 		} else {
 			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->xlink);
-			// ALTER TABLE Auto_increment 这个不需要改，REPLACE INTO 直接覆盖
 			return $val;
 		}
 	}
@@ -191,7 +196,12 @@ class db_mysql implements db_interface {
 				return $val;
 			}
 		} else {
-			$this->query("REPLACE INTO {$this->tablepre}framework_count SET count='$val', name='$key'", $this->xlink);
+			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
+			if(empty($arr)) {
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='$val'", $this->xlink);
+			} else {
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+			}
 			return $val;
 		}
 	}
@@ -456,11 +466,9 @@ class db_mysql implements db_interface {
 				`count` int(11) unsigned NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
+			$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
 		} else {
 			throw new Exception('framework_cout 错误, mysql_error:'.mysql_error());
-		}
-		if(empty($count)) {
-			$this->query("REPLACE INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
 		}
 		return $count;
 	}
@@ -489,7 +497,13 @@ class db_mysql implements db_interface {
 		if(empty($maxid)) {
 			$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
 			$maxid = $this->result($query, 0);
-			$this->query("REPLACE INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
+			
+			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
+			if(empty($arr)) {
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$table', maxid='$maxid'", $this->xlink);
+			} else {
+				$this->query("UPDATE {$this->tablepre}framework_count SET maxid='$maxid' WHERE name='$table'", $this->xlink);
+			}
 		}
 		return $maxid;
 	}

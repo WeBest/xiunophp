@@ -123,7 +123,13 @@ class db_pdo_mysql implements db_interface {
 			// 覆盖主键的值
 			$data += $keyarr;
 			$s = $this->arr_to_sqladd($data);
-			return $this->query("REPLACE INTO $tablename SET $s");
+			
+			$exists = $this->get($key);
+			if(empty($exists)) {
+				return $this->query("INSERT INTO $tablename SET $s", $this->wlink);
+			} else {
+				return $this->query("UPDATE $tablename SET $s", $this->wlink);
+			}
 		} else {
 			return FALSE;
 		}
@@ -160,7 +166,6 @@ class db_pdo_mysql implements db_interface {
 			return $maxid += $val;
 		} else {
 			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->xlink);
-			// ALTER TABLE Auto_increment 这个不需要改，REPLACE INTO 直接覆盖
 			return $val;
 		}
 	}
@@ -179,7 +184,12 @@ class db_pdo_mysql implements db_interface {
 				return $val;
 			}
 		} else {
-			$this->query("REPLACE INTO {$this->tablepre}framework_count SET count='$val', name='$key'", $this->xlink);
+			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
+			if(empty($arr)) {
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='$val'", $this->xlink);
+			} else {
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+			}
 			return $val;
 		}
 	}
@@ -321,7 +331,7 @@ class db_pdo_mysql implements db_interface {
 			$result = $link->query($sql);
 			defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
 		} else {
-			$result = $link->exec($sql);
+			$result = $this->exec($sql, $link);
 		}
 		if($result === FALSE) {
 			$error = $link->errorInfo();
@@ -331,8 +341,9 @@ class db_pdo_mysql implements db_interface {
 	}
 	
 	// 返回行数
-	public function exec($sql) {
-		$n = $this->wlink->exec($sql);
+	public function exec($sql, $link = NULL) {
+		empty($link) && $link = $this->wlink;
+		$n = $link->exec($sql);
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
 		return $n;
 	}
@@ -420,7 +431,7 @@ class db_pdo_mysql implements db_interface {
 				`count` int(11) unsigned NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
-			$this->query("REPLACE INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
+			$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
 		}
 		return $count;
 	}
@@ -441,15 +452,18 @@ class db_pdo_mysql implements db_interface {
 				$maxid = intval($arr['maxid']);
 			}
 		} catch (Exception $e) {
-			
-			$r = $this->query("CREATE TABLE `{$this->tablepre}framework_maxid` (
-				`name` char(32) NOT NULL default '',
-				`maxid` int(11) unsigned NOT NULL default '0',
-				PRIMARY KEY (`name`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
-			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
-			$maxid = $arr['maxid'];
-			$this->query("REPLACE INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
+			if(strpos($e->getMessage(), 'Errno: 42S02') !== FALSE) {
+				$r = $this->query("CREATE TABLE `{$this->tablepre}framework_maxid` (
+					`name` char(32) NOT NULL default '',
+					`maxid` int(11) unsigned NOT NULL default '0',
+					PRIMARY KEY (`name`)
+					) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
+				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
+				$maxid = $arr['maxid'];
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$table', maxid='$maxid'", $this->xlink);
+			} else {
+				throw new Exception($e->getMessage());
+			}
 		}
 		return $maxid;
 	}
