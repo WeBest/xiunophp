@@ -131,7 +131,7 @@ class db_mysql implements db_interface {
 			if(empty($exists)) {
 				return $this->query("INSERT INTO $tablename SET $s", $this->wlink);
 			} else {
-				return $this->query("UPDATE $tablename SET $s", $this->wlink);
+				return $this->update($key, $data);
 			}
 		} else {
 			return FALSE;
@@ -491,19 +491,9 @@ class db_mysql implements db_interface {
 				`maxid` int(11) unsigned NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
+			$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 		} else {
 			throw new Exception("{$this->tablepre}framework_maxid 错误, mysql_errno:".mysql_errno().', mysql_error:'.mysql_error());
-		}
-		if(empty($maxid)) {
-			$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
-			$maxid = $this->result($query, 0);
-			
-			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
-			if(empty($arr)) {
-				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$table', maxid='$maxid'", $this->xlink);
-			} else {
-				$this->query("UPDATE {$this->tablepre}framework_count SET maxid='$maxid' WHERE name='$table'", $this->xlink);
-			}
 		}
 		return $maxid;
 	}

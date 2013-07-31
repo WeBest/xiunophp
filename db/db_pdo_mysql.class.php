@@ -128,7 +128,7 @@ class db_pdo_mysql implements db_interface {
 			if(empty($exists)) {
 				return $this->query("INSERT INTO $tablename SET $s", $this->wlink);
 			} else {
-				return $this->query("UPDATE $tablename SET $s", $this->wlink);
+				return $this->update($key, $data);
 			}
 		} else {
 			return FALSE;
@@ -460,7 +460,7 @@ class db_pdo_mysql implements db_interface {
 					) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
 				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
 				$maxid = $arr['maxid'];
-				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$table', maxid='$maxid'", $this->xlink);
+				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 			} else {
 				throw new Exception($e->getMessage());
 			}

@@ -401,7 +401,6 @@ class db_pdo_sqlite implements db_interface {
 			} else {
 				throw new Exception($e->getMessage());
 			}
-			
 		}
 		return $count;
 	}
@@ -430,7 +429,7 @@ class db_pdo_sqlite implements db_interface {
 				)", $this->link);
 			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
 			$maxid = $arr['maxid'];
-			$this->query("INSERT INTO {$this->tablepre}framework_count (name, maxid) VALUES ('$table', '$maxid')", $this->link);
+			$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 		}
 		return $maxid;
 	}
