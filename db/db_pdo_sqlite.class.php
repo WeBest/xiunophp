@@ -475,7 +475,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	private function addslashes($s) {
 		//$s = str_replace('\\', '\\\\', $s);
-		$s = str_replace('\'', '\\\'', $s);
+		$s = str_replace('\'', '\'\'', $s);
 		return $s;
 	}
 	
