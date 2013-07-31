@@ -426,12 +426,16 @@ class db_pdo_mysql implements db_interface {
 				$count = intval($arr['count']);
 			}
 		} catch (Exception $e) {
-			$this->query("CREATE TABLE {$this->tablepre}framework_count (
-				`name` char(32) NOT NULL default '',
-				`count` int(11) unsigned NOT NULL default '0',
-				PRIMARY KEY (`name`)
-				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
-			$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
+			if(strpos($e->getMessage(), 'Errno: 42S02') !== FALSE) {
+				$this->query("CREATE TABLE {$this->tablepre}framework_count (
+					`name` char(32) NOT NULL default '',
+					`count` int(11) unsigned NOT NULL default '0',
+					PRIMARY KEY (`name`)
+					) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
+			} else {
+				throw new Exception('table_count 错误, mysql_error:'.mysql_error());
+			}
 		}
 		return $count;
 	}

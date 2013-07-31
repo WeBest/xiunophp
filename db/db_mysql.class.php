@@ -485,12 +485,19 @@ class db_mysql implements db_interface {
 		$query = mysql_query("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
 		if($query) {
 			$maxid = $this->result($query, 0);
+			if(empty($maxid)) {
+				$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
+				$maxid = $this->result($query, 0);
+				$this->query("UPDATE {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
+			}
 		} elseif(mysql_errno($this->xlink) == 1146) {
 			$this->query("CREATE TABLE `{$this->tablepre}framework_maxid` (
 				`name` char(32) NOT NULL default '',
 				`maxid` int(11) unsigned NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
+			$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
+			$maxid = $this->result($query, 0);
 			$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 		} else {
 			throw new Exception("{$this->tablepre}framework_maxid 错误, mysql_errno:".mysql_errno().', mysql_error:'.mysql_error());
