@@ -67,7 +67,7 @@ class db_pdo_sqlite implements db_interface {
 			if($sqladd) {
 				$sql = "SELECT * FROM $tablename WHERE $sqladd";
 				defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-				$result = $this->link->query($sql);
+				$result = $this->query($sql);
 				$result->setFetchMode(PDO::FETCH_ASSOC);
 				$datalist = $result->fetchAll();
 				foreach($datalist as $data) {
@@ -185,7 +185,7 @@ class db_pdo_sqlite implements db_interface {
 		$s .= ($limit ? " LIMIT $start, $limit" : '');
 		$sql = $s;
 		defined('DEBUG') && DEBUG && isset($_SERVER['sqls']) && count($_SERVER['sqls']) < 1000 && $_SERVER['sqls'][] = htmlspecialchars(stripslashes($sql));// fixed: 此处导致的轻微溢出后果很严重，已经修正。
-		$result = $this->link->query($sql);
+		$result = $this->query($sql);
 		if(!$result) {
 			return array();
 		}
@@ -281,7 +281,6 @@ class db_pdo_sqlite implements db_interface {
 	
 	// 返回的是结果集，判断是否为写入
 	public function query($sql, $link = NULL) {
-		echo $sql."\r\n\r\n";
 		empty($link) && $link = $this->link;
 		$type = strtolower(substr($sql, 0, 4));
 		if($type == 'sele' || $type == 'show') {
@@ -475,6 +474,7 @@ class db_pdo_sqlite implements db_interface {
 	}
 	
 	private function addslashes($s) {
+		//$s = str_replace('\\', '\\\\', $s);
 		$s = str_replace('\'', '\\\'', $s);
 		return $s;
 	}
