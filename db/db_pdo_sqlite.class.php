@@ -416,7 +416,9 @@ class db_pdo_sqlite implements db_interface {
 		try {
 			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->link);
 			if($arr === FALSE) {
-				$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '0')", $this->link);
+				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
+				$maxid = $arr['maxid'];
+				$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 			} else {
 				$maxid = intval($arr['maxid']);
 			}

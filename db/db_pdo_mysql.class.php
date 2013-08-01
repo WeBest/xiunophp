@@ -451,7 +451,9 @@ class db_pdo_mysql implements db_interface {
 		try {
 			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
 			if($arr === FALSE) {
-				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='0'", $this->xlink);
+				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
+				$maxid = $arr['maxid'];
+				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 			} else {
 				$maxid = intval($arr['maxid']);
 			}

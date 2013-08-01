@@ -442,7 +442,7 @@ class db_mysql implements db_interface {
 	}
 
 	private function result($query, $row) {
-		return mysql_num_rows($query) ? intval(mysql_result($query, $row)) : 0;
+		return mysql_num_rows($query) ? intval(mysql_result($query, $row)) : FALSE;
 	}
 	
 	/*
@@ -485,10 +485,10 @@ class db_mysql implements db_interface {
 		$query = mysql_query("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
 		if($query) {
 			$maxid = $this->result($query, 0);
-			if(empty($maxid)) {
+			if($maxid === FALSE) {
 				$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
 				$maxid = $this->result($query, 0);
-				$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$maxid' WHERE name='$table'", $this->xlink);
+				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET maxid='$maxid', name='$table'", $this->xlink);
 			}
 		} elseif(mysql_errno($this->xlink) == 1146) {
 			$this->query("CREATE TABLE `{$this->tablepre}framework_maxid` (
