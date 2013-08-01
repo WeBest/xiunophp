@@ -149,7 +149,7 @@ class template {
 				$s = preg_replace_callback('#\{require\s+([^}]*?)\}#is', array($this, 'requiretpl'), $s); // php5.2 支持 array(), php 5.3 支持 self::requiretpl
 			}
 			$s = preg_replace("/<!--\{(.+?)\}-->/s", "{\\1}", $s);
-			$s = preg_replace_callback('#\{hook\s+([^}]+)\}#is', array($this, 'process_hook'), $s);
+			$s = preg_replace_callback('#\{hook\s+([^}]+)\}#is', array($this, 'process_hook'), $s); // 不允许嵌套！
 			$s = preg_replace_callback('#\t*//\s*hook\s+([^\s]+)#is', array($this, 'process_hook'), $s);// (\$conf, '\\1')"
 		}
 		

@@ -488,7 +488,7 @@ class db_mysql implements db_interface {
 			if(empty($maxid)) {
 				$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
 				$maxid = $this->result($query, 0);
-				$this->query("UPDATE {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$maxid' WHERE name='$table'", $this->xlink);
 			}
 		} elseif(mysql_errno($this->xlink) == 1146) {
 			$this->query("CREATE TABLE `{$this->tablepre}framework_maxid` (

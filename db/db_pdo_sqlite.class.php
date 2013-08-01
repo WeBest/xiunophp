@@ -144,11 +144,11 @@ class db_pdo_sqlite implements db_interface {
 		} elseif(is_string($val)) {
 			if($val{0} == '+') {
 				$val = $count + abs(intval($val));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->link);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->link);
 				return $val;
 			} else {
 				$val = max(0, $count - abs(intval($val)));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->link);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->link);
 				return $val;
 			}
 		} else {
