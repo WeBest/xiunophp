@@ -460,6 +460,9 @@ class db_mysql implements db_interface {
 		$query = mysql_query("SELECT count FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
 		if($query) {
 			$count = $this->result($query, 0);
+			if($count === FALSE) {
+				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='0'", $this->xlink);
+			}
 		} elseif(mysql_errno($this->xlink) == 1146) {
 			$this->query("CREATE TABLE {$this->tablepre}framework_count (
 				`name` char(32) NOT NULL default '',
