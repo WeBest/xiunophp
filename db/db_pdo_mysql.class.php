@@ -335,7 +335,7 @@ class db_pdo_mysql implements db_interface {
 		}
 		if($result === FALSE) {
 			$error = $link->errorInfo();
-			throw new Exception('MySQL Query Error:'.$sql.' '.(isset($error[2]) ? "Errstr: $error[2]" : ''));
+			throw new Exception('Pdo_MySQL Query Error:'.$sql.' '.(isset($error[2]) ? "Errstr: $error[2]" : ''));
 		}
 		return $result;
 	}
