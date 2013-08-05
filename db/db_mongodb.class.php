@@ -72,7 +72,11 @@ class db_mongodb implements db_interface {
 			}
 			return $this->rdb;
 		} elseif($var == 'xdb') {
-			$this->xdb = $this->xlink->selectDB($conf['arbiter']['name']);
+			if(empty($this->conf['arbiter'])) {
+				$this->xdb = $this->wdb;
+			} else {
+				$this->xdb = $this->xlink->selectDB($conf['arbiter']['name']);
+			}
 			return $this->xdb;
 		}
 	}
