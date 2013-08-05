@@ -122,6 +122,7 @@ class db_mongodb implements db_interface {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		unset($data['_id']);// mongodb 自带的id
 		$this->debug('update', $key, $data);
+		$coll = $this->wdb->selectCollection($table);
 		$coll->update($keyarr, array('$set' => $data));
 		return TRUE;
 	}
@@ -320,7 +321,7 @@ class db_mongodb implements db_interface {
 	private function connect($host, $user, $password, $name) {
 		$useradd = empty($user) ? '' : "$user:$password@";
 		try {
-			$link = new Mongo("mongodb://{$useradd}$host/", array("persist"=>"onename", 'timeout'=>100));
+			$link = new Mongo("mongodb://{$useradd}$host/", array('timeout'=>100));//"persist"=>"onename", 
 		} catch(Exception $e) {
 			throw new Exception('不能连接到 Mongodb 服务器，Error:'.$e->getMessage());
 			exit;
