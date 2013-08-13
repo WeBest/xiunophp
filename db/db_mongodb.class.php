@@ -131,7 +131,7 @@ class db_mongodb implements db_interface {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		$coll = $this->wdb->selectCollection($table);
 		$this->debug('delete', $key, array());
-		return $coll->remove($keyarr, true);
+		return $coll->remove($keyarr, array('justOne'=>TRUE)); // $arr
 	}
 	
 	/**
@@ -321,7 +321,7 @@ class db_mongodb implements db_interface {
 	private function connect($host, $user, $password, $name) {
 		$useradd = empty($user) ? '' : "$user:$password@";
 		try {
-			$link = new Mongo("mongodb://{$useradd}$host/", array('timeout'=>100));//"persist"=>"onename", 
+			$link = new Mongo("mongodb://{$useradd}$host/");//"persist"=>"onename", connectTimeoutMS , array('timeout'=>100)
 		} catch(Exception $e) {
 			throw new Exception('不能连接到 Mongodb 服务器，Error:'.$e->getMessage());
 			exit;
