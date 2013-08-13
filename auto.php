@@ -224,6 +224,12 @@ class index_control extends base_control {
 		parent::__construct(\$conf);
 	}
 	
+	public function on_index() {
+		
+		\$this->message('Default Index Control Page.');
+	
+	}
+	
 	public function on_hello() {
 		
 		\$username = 'Jobs';
