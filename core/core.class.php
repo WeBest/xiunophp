@@ -479,7 +479,7 @@ class core {
 	
 	public static function process_hook_callback($matchs) {
 		$s = $matchs[1];
-		return self::process_hook($_SERVER['preg_replace_callback_arg'], $s);
+		return self::process_hook($_ENV['preg_replace_callback_arg'], $s);
 	}
 	
 	public static function process_urlrewrite(&$conf, &$s) {
@@ -503,7 +503,7 @@ class core {
 				$s2 = file_get_contents($realpath);
 				// 需要 php5.3 以后才支持匿名函数: function($matchs) use ($conf) {}
 				// 这里不得不用全局变量来解决这个问题
-				$_SERVER['preg_replace_callback_arg'] = $conf;
+				$_ENV['preg_replace_callback_arg'] = $conf;
 				$s2 = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s2);
 				core::process_urlrewrite($conf, $s2);
 				file_put_contents($tmptmpfile, $s2);
@@ -651,7 +651,7 @@ class core {
 				return FALSE;
 			}
 			$s = file_get_contents($orgfile);
-			$_SERVER['preg_replace_callback_arg'] = $conf;
+			$_ENV['preg_replace_callback_arg'] = $conf;
 			$s = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s);
 			file_put_contents($modelfile, $s);
 		}
@@ -776,7 +776,7 @@ class core {
 			}
 			$s = file_get_contents($controlfile);
 			core::process_include($conf, $s);
-			$_SERVER['preg_replace_callback_arg'] = $conf;
+			$_ENV['preg_replace_callback_arg'] = $conf;
 			$s = preg_replace_callback('#\t*\/\/\s*hook\s+([^\s]+)#is', 'core::process_hook_callback', $s);
 
 			core::process_urlrewrite($conf, $s);
