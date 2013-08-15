@@ -446,7 +446,7 @@ class misc {
 	}
 
 	// SAE 重载了 file_get_contents()
-	public static function fetch_url($url, $timeout = 5, $post = '', $cookie = '', $deep = 0) {
+	public static function fetch_url($url, $timeout = 10, $post = '', $cookie = '', $deep = 0) {
 		if($deep > 5) throw new Exception('超出 fetch_url() 最大递归深度！');
 		if(substr($url, 0, 5) == 'https') {
 			return self::https_fetch_url($url, $timeout);
@@ -456,7 +456,7 @@ class misc {
 		$allow_url_fopen = strtolower(ini_get('allow_url_fopen'));
 		$allow_url_fopen = (empty($allow_url_fopen) || $allow_url_fopen == 'off') ? 0 : 1;
 		if(function_exists('fsockopen')) {
-			$limit = 500000;
+			$limit = 2000000;
 			$ip = '';
 			$return = '';
 			$matches = parse_url($url);

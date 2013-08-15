@@ -4,6 +4,11 @@
    该类库收集于互联网，版权未知，由 xiuno 修正了部分64位下的 bug, 支持了SAE, 如果谁知道请麻烦告知作者。
 */
 
+/*if(!defined('FRAMEWORK_TMP_TMP_PATH')) {
+	define('FRAMEWORK_TMP_TMP_PATH', './');
+}
+date_default_timezone_set('Asia/Shanghai');
+*/
 class php_zip {
 	private $ctrl_dir	= array();
 	private $datasec	= array();
@@ -181,13 +186,13 @@ class php_zip {
 		$size	 = filesize($zipfile);
 		$max_size = ($size < 277) ? $size : 277;
 		
-		@fseek($zip, $size - $max_size);
+		fseek($zip, $size - $max_size);
 		$pos   = ftell($zip);
 		$bytes = 0;
 		
 		while($pos < $size)
 		{
-			$byte  = @fread($zip, 1);
+			$byte  = fread($zip, 1);
 			
 			// fixed 64 bit bug, by axiuno@gmail.com
 			// 64 bit
@@ -516,7 +521,7 @@ class xn_zip {
 			copy($tmppath.$file, $destpath.$file);
 			unlink($tmppath.$file);
 		}
-		misc::rmdir($tmppath);
+		//misc::rmdir($tmppath);
 		return $archive->files;
 	}
 	
@@ -533,6 +538,4 @@ class xn_zip {
 	}
 }
 
-//xn_zip::unzip('../../install/plugin/denglu.zip', 'saestor://upload/denglu/');
-//xn_zip::unzip('../../install/plugin/denglu.zip', 'd:/tmp/');
 ?>

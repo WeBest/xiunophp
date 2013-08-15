@@ -84,7 +84,7 @@ class db_pdo_mysql implements db_interface {
 		if(!is_array($key)) {
 			list($table, $keyarr, $sqladd) = $this->parse_key($key);
 			$tablename = $this->tablepre.$table;
-       			return $this->fetch_first("SELECT * FROM $tablename WHERE $sqladd");
+       			return $this->fetch_first("SELECT * FROM $tablename WHERE $sqladd LIMIT 1");
 		} else {
 			// 此处可以递归调用，但是为了效率，单独处理
 			$sqladd = $_sqladd = $table =  $tablename = '';
@@ -139,13 +139,13 @@ class db_pdo_mysql implements db_interface {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		$tablename = $this->tablepre.$table;
 		$s = $this->arr_to_sqladd($data);
-		return $this->query("UPDATE $tablename SET $s WHERE $sqladd");
+		return $this->query("UPDATE $tablename SET $s WHERE $sqladd LIMIT 1");
 	}
 	
 	public function delete($key) {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		$tablename = $this->tablepre.$table;
-		return $this->query("DELETE FROM $tablename WHERE $sqladd");
+		return $this->query("DELETE FROM $tablename WHERE $sqladd LIMIT 1");
 	}
 	
 	/**
@@ -162,10 +162,10 @@ class db_pdo_mysql implements db_interface {
 			return $maxid;
 		} elseif(is_string($val) && $val{0} == '+') {
 			$val = intval($val);
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table' LIMIT 1", $this->xlink);
 			return $maxid += $val;
 		} else {
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table' LIMIT 1", $this->xlink);
 			return $val;
 		}
 	}
@@ -176,11 +176,11 @@ class db_pdo_mysql implements db_interface {
 		} elseif(is_string($val)) {
 			if($val{0} == '+') {
 				$val = $count + abs(intval($val));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key' LIMIT 1", $this->xlink);
 				return $val;
 			} else {
 				$val = max(0, $count - abs(intval($val)));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key' LIMIT 1", $this->xlink);
 				return $val;
 			}
 		} else {
@@ -188,7 +188,7 @@ class db_pdo_mysql implements db_interface {
 			if(empty($arr)) {
 				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='$val'", $this->xlink);
 			} else {
-				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key' LIMIT 1", $this->xlink);
 			}
 			return $val;
 		}

@@ -86,7 +86,7 @@ class db_mysql implements db_interface {
 		if(!is_array($key)) {
 			list($table, $keyarr, $sqladd) = $this->parse_key($key);
 			$tablename = $this->tablepre.$table;
-			$result = $this->query("SELECT * FROM $tablename WHERE $sqladd", $this->rlink);
+			$result = $this->query("SELECT * FROM $tablename WHERE $sqladd LIMIT 1", $this->rlink);
 			$arr = mysql_fetch_assoc($result);
 			return $arr;
 		} else {
@@ -143,13 +143,13 @@ class db_mysql implements db_interface {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		$tablename = $this->tablepre.$table;
 		$s = $this->arr_to_sqladd($data);
-		return $this->query("UPDATE $tablename SET $s WHERE $sqladd", $this->wlink);
+		return $this->query("UPDATE $tablename SET $s WHERE $sqladd LIMIT 1", $this->wlink);
 	}
 
 	public function delete($key) {
 		list($table, $keyarr, $sqladd) = $this->parse_key($key);
 		$tablename = $this->tablepre.$table;
-		return $this->query("DELETE FROM $tablename WHERE $sqladd", $this->wlink);
+		return $this->query("DELETE FROM $tablename WHERE $sqladd LIMIT 1", $this->wlink);
 	}
 	
 	/**
@@ -167,10 +167,10 @@ class db_mysql implements db_interface {
 			return $maxid;
 		} elseif(is_string($val) && $val{0} == '+') {
 			$val = intval($val);
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid=maxid+'$val' WHERE name='$table' LIMIT 1", $this->xlink);
 			return $maxid += $val;
 		} else {
-			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table'", $this->xlink);
+			$this->query("UPDATE {$this->tablepre}framework_maxid SET maxid='$val' WHERE name='$table' LIMIT 1", $this->xlink);
 			return $val;
 		}
 	}
@@ -188,19 +188,19 @@ class db_mysql implements db_interface {
 			$count = $this->table_count($key);
 			if($val{0} == '+') {
 				$val = $count + abs(intval($val));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key' LIMIT 1", $this->xlink);
 				return $val;
 			} else {
 				$val = max(0, $count - abs(intval($val)));
-				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count = '$val' WHERE name='$key' LIMIT 1", $this->xlink);
 				return $val;
 			}
 		} else {
-			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_count WHERE name='$key'", $this->xlink);
+			$arr = $this->fetch_first("SELECT * FROM {$this->tablepre}framework_count WHERE name='$key' LIMIT 1", $this->xlink);
 			if(empty($arr)) {
 				$this->query("INSERT INTO {$this->tablepre}framework_count SET name='$key', count='$val'", $this->xlink);
 			} else {
-				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key'", $this->xlink);
+				$this->query("UPDATE {$this->tablepre}framework_count SET count='$val' WHERE name='$key' LIMIT 1", $this->xlink);
 			}
 			return $val;
 		}
