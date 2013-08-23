@@ -320,6 +320,9 @@ class db_pdo_mysql implements db_interface {
 	// DROP table
 	public function table_drop($table) {
 		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		// 删除 count, maxid
+		try {$this->query("DELETE FROM {$this->tablepre}framework_count WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
+		try {$this->query("DELETE FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
 		return $this->query($sql, $this->wlink);
 	}
 	
@@ -446,13 +449,17 @@ class db_pdo_mysql implements db_interface {
 		table_maxid('thread-tid');
 	*/
 	private function table_maxid($key) {
-		list($table, $col) = explode('-', $key);
+		list($table, $col) = explode('-', $key.'-');
 		$maxid = 0;
 		try {
 			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
 			if($arr === FALSE) {
-				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
-				$maxid = $arr['maxid'];
+				if($col) {
+					$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
+					$maxid = $arr['maxid'];
+				} else {
+					$maxid = 0;
+				}
 				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 			} else {
 				$maxid = intval($arr['maxid']);
@@ -464,8 +471,12 @@ class db_pdo_mysql implements db_interface {
 					`maxid` int(11) unsigned NOT NULL default '0',
 					PRIMARY KEY (`name`)
 					) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
-				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
-				$maxid = $arr['maxid'];
+				if($col) {
+					$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->xlink);
+					$maxid = $arr['maxid'];
+				} else {
+					$maxid = 0;
+				}
 				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 			} else {
 				throw new Exception($e->getMessage());

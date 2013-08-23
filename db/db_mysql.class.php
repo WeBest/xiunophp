@@ -159,8 +159,9 @@ class db_mysql implements db_interface {
 	 * maxid('user-uid', 10000) 设置最大的 maxid 为 10000
 	 *
 	 */
+	// xiunophp 2.2 以后，支持 key = tablename，也就是不指定 col
 	public function maxid($key, $val = FALSE) {
-		list($table, $col) = explode('-', $key);
+		list($table, $col) = explode('-', $key.'-');
 		$maxid = $this->table_maxid($key);
 		
 		if($val === FALSE) {
@@ -357,6 +358,9 @@ class db_mysql implements db_interface {
 	// DROP table
 	public function table_drop($table) {
 		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		// 删除 count, maxid
+		try {$this->query("DELETE FROM {$this->tablepre}framework_count WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
+		try {$this->query("DELETE FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
 		return $this->query($sql, $this->wlink);
 	}
 
@@ -477,20 +481,24 @@ class db_mysql implements db_interface {
 	}
 	
 	/*
-		例子：只能为表名
+		table_maxid('forum');
 		table_maxid('forum-fid');
 		table_maxid('thread-tid');
 	*/
 	private function table_maxid($key) {
 		$key = addslashes($key);
-		list($table, $col) = explode('-', $key);
+		list($table, $col) = explode('-', $key.'-');
 		$maxid = 0;
 		$query = mysql_query("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);
 		if($query) {
 			$maxid = $this->result($query, 0);
 			if($maxid === FALSE) {
-				$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
-				$maxid = $this->result($query, 0);
+				if($col) {
+					$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
+					$maxid = $this->result($query, 0);
+				} else {
+					$maxid = 0;
+				}
 				$this->query("INSERT INTO {$this->tablepre}framework_maxid SET maxid='$maxid', name='$table'", $this->xlink);
 			}
 		} elseif(mysql_errno($this->xlink) == 1146) {
@@ -499,8 +507,12 @@ class db_mysql implements db_interface {
 				`maxid` int(11) unsigned NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_general_ci", $this->xlink);
-			$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
-			$maxid = $this->result($query, 0);
+			if($col) {
+				$query = $this->query("SELECT MAX($col) FROM {$this->tablepre}$table", $this->xlink);
+				$maxid = $this->result($query, 0);
+			} else {
+				$maxid = 0;
+			}
 			$this->query("INSERT INTO {$this->tablepre}framework_maxid SET name='$table', maxid='$maxid'", $this->xlink);
 		} else {
 			throw new Exception("{$this->tablepre}framework_maxid 错误, mysql_errno:".mysql_errno().', mysql_error:'.mysql_error());

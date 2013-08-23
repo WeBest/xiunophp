@@ -116,6 +116,7 @@ class db_pdo_sqlite implements db_interface {
 	
 	/**
 	 * 
+	 * maxid('user')
 	 * maxid('user-uid') 返回 user 表最大 userid
 	 * maxid('user-uid', '+1') maxid + 1, 占位，保证不会重复
 	 * maxid('user-uid', 10000) 设置最大的 maxid 为 10000
@@ -279,6 +280,9 @@ class db_pdo_sqlite implements db_interface {
 	// DROP table
 	public function table_drop($table) {
 		$sql = "DROP TABLE IF EXISTS {$this->tablepre}$table";
+		// 删除 count, maxid
+		try {$this->query("DELETE FROM {$this->tablepre}framework_count WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
+		try {$this->query("DELETE FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->xlink);} catch (Exception $e) {};
 		return $this->query($sql, $this->wlink);
 	}
 	
@@ -411,13 +415,17 @@ class db_pdo_sqlite implements db_interface {
 		table_maxid('thread-tid');
 	*/
 	private function table_maxid($key) {
-		list($table, $col) = explode('-', $key);
+		list($table, $col) = explode('-', $key.'-');
 		$maxid = 0;
 		try {
 			$arr = $this->fetch_first("SELECT maxid FROM {$this->tablepre}framework_maxid WHERE name='$table'", $this->link);
 			if($arr === FALSE) {
-				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
-				$maxid = $arr['maxid'];
+				if($col) {
+					$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
+					$maxid = $arr['maxid'];
+				} else {
+					$maxid = 0;
+				}
 				$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 			} else {
 				$maxid = intval($arr['maxid']);
@@ -429,8 +437,12 @@ class db_pdo_sqlite implements db_interface {
 				maxid int(11) NOT NULL default '0',
 				PRIMARY KEY (`name`)
 				)", $this->link);
-			$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
-			$maxid = $arr['maxid'];
+			if($col) {
+				$arr = $this->fetch_first("SELECT MAX($col) as maxid FROM {$this->tablepre}$table", $this->link);
+				$maxid = $arr['maxid'];
+			} else {
+				$maxid = 0;
+			}
 			$this->query("INSERT INTO {$this->tablepre}framework_maxid (name, maxid) VALUES ('$table', '$maxid')", $this->link);
 		}
 		return $maxid;

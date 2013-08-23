@@ -43,7 +43,7 @@ class image {
 	 */
 	public static function thumb($sourcefile, $destfile, $forcedwidth = 80, $forcedheight = 80) {
 		$return = array('filesize'=>0, 'width'=>0, 'height'=>0);
-		$imgcomp = 15;
+		$imgcomp = 10;
 		$destext = self::ext($destfile);
 		if(!in_array($destext, array('gif', 'jpg', 'bmp', 'png'))) {
 			return $return;
@@ -247,18 +247,24 @@ class image {
 			$des_height = $src_height;
 			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
 			return filesize($destfile);
+		// 原图为横着的矩形
 		} elseif($src_scale >= $des_scale) {
 			// 以原图的高度作为标准，进行缩略
 			$des_height = $src_height;
-			$des_width = $src_height * $des_scale;
+			$des_width = $src_height / $des_scale;
 			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
 			if($n <=0) return 0;
 			$r = image::thumb($destfile, $destfile, $forcedwidth, $forcedheight);
 			return $r['filesize'];
+		// 原图为竖着的矩形
 		} else {
 			// 以原图的宽度作为标准，进行缩略
 			$des_width = $src_width;
-			$des_height = $src_width * $des_scale;
+			$des_height = $src_width / $des_scale;
+			/*echo "src_scale: $src_scale, src_width: $src_width, src_height: $src_height \n";
+			echo "des_scale: $des_scale, forcedwidth: $forcedwidth, forcedheight: $forcedheight \n";
+			echo "des_width: $des_width, des_height: $des_height \n";
+			exit;*/
 			$n = image::clip($sourcefile, $destfile, 0, 0, $des_width, $des_height);
 			if($n <=0) return 0;
 			$r = image::thumb($destfile, $destfile, $forcedwidth, $forcedheight);
