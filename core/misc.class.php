@@ -398,9 +398,9 @@ class misc {
 	}
 
 	// https request
-	public static function https_fetch_url($url, $timeout=30, $header=array()) {
+	public static function https_fetch_url($url, $timeout=30, $post = '', $cookie = '', $deep = 0) {
 		if(substr($url, 0, 5) == 'http:') {
-			return self::fetch_url($url, $timeout);
+			return self::fetch_url($url, $timeout, $post, $cookie, $deep);
 		}
 		$w = stream_get_wrappers();
 		$allow_url_fopen = strtolower(ini_get('allow_url_fopen'));
@@ -417,11 +417,15 @@ class misc {
 		curl_setopt($ch, CURLOPT_USERAGENT, core::gpc('HTTP_USER_AGENT', 'S'));
 		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, 0); // 对认证证书来源的检查
 		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 1); // 从证书中检查SSL加密算法是否存在
-		//curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转, 安全模式不允许
-		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-		if(!empty($header)) {
-			curl_setopt($ch, CURLOPT_HTTPHEADER, $header);
+		if($post) {
+			curl_setopt($ch, CURLOPT_POST, 1);
+			curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
 		}
+		if($cookie) {
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array("Cookie: $cookie"));
+		}
+		(!ini_get('safe_mode') && !ini_get('open_basedir')) && curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1); // 使用自动跳转, 安全模式不允许
+		curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
 		$data = curl_exec($ch);
 		if(curl_errno($ch)) {
 			throw new Exception('Errno'.curl_error($ch));//捕抓异常
@@ -449,7 +453,7 @@ class misc {
 	public static function fetch_url($url, $timeout = 10, $post = '', $cookie = '', $deep = 0) {
 		if($deep > 5) throw new Exception('超出 fetch_url() 最大递归深度！');
 		if(substr($url, 0, 5) == 'https') {
-			return self::https_fetch_url($url, $timeout);
+			return self::https_fetch_url($url, $timeout, $post, $cookie, $deep);
 		}
 		
 		$w = stream_get_wrappers();
@@ -524,7 +528,7 @@ class misc {
 				@fclose($fp);
 				return $return;
 			}
-		} elseif(function_exists('curl_init') && empty($cookie)) {
+		} elseif(function_exists('curl_init')) {
 			$ch = curl_init();
 			curl_setopt($ch, CURLOPT_URL, $url);
 			curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
@@ -532,6 +536,9 @@ class misc {
 			if($post) {
 				curl_setopt($ch, CURLOPT_POST, 1);
 				curl_setopt($ch, CURLOPT_POSTFIELDS, $post);
+			}
+			if($cookie) {
+				curl_setopt($ch, CURLOPT_HTTPHEADER, array('Cookie', $cookie));
 			}
 			$data = curl_exec($ch);
 			
