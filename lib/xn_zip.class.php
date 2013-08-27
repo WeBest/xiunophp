@@ -381,9 +381,14 @@ class php_zip {
 	private function compatible_gzinflate($gzData) {
 		
 		// gzencode 函数
-		if ( substr($gzData, 0, 3) == "\x1f\x8b\x08" ) {
+		if (substr($gzData, 0, 3) == "\x1f\x8b\x08") {
+			// 1F 8B 08 00 00 00 00 00 00 03
+			$s = '';
 			if(function_exists('gzdecode')) {
-				return gzdecode($gzData);
+				$s = gzdecode($gzData);
+			}
+			if(!empty($s)) {
+				return $s;
 			} else {
 				$i = 10;
 				$flg = ord( substr($gzData, 3, 1) );
