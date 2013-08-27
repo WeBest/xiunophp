@@ -235,7 +235,7 @@ class db_pdo_sqlite implements db_interface {
 		$where = $this->cond_to_sqladd($cond);
 		$set = $this->arr_to_sqladd($update);
 		$table = $this->tablepre.$table;
-		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
+		$sqladd = $lowprority ? '' : '';
 		return $this->exec("UPDATE $sqladd $table SET $set[sqldata] $where", $this->link);
 	}
 	
@@ -243,7 +243,7 @@ class db_pdo_sqlite implements db_interface {
 	public function index_delete($table, $cond, $lowprority = FALSE) {
 		$where = $this->cond_to_sqladd($cond);
 		$table = $this->tablepre.$table;
-		$sqladd = $lowprority ? 'LOW_PRIORITY' : '';
+		$sqladd = $lowprority ? '' : '';
 		return $this->exec("DELETE $lowprority FROM $table $where", $this->link);
 	}
 	
